@@ -184,13 +184,14 @@ class Taximetro:
 
     def finalizar_carrera(self):
         tiempo_actual = time.time()
+        tiempo_inicio = self.tiempo_ultimo_cambio - (self.tiempo_parado + self.tiempo_movimiento)
         self._cambiar_estado(tiempo_actual, self.en_movimiento)
         self.total_euros = (self.tiempo_movimiento * self.tarifa_movimiento) + (self.tiempo_parado * self.tarifa_parado)
         self.total_label.config(text=f"Total a cobrar: {self.total_euros:.2f} euros")
         messagebox.showinfo("Carrera finalizada", f"Total a cobrar: {self.total_euros:.2f} euros")
         self.insertar_registro(
-            tiempo_inicio=self.tiempo_ultimo_cambio - (self.tiempo_parado + self.tiempo_movimiento),
-            tiempo_fin=self.tiempo_ultimo_cambio,
+            tiempo_inicio=tiempo_inicio,
+            tiempo_fin=tiempo_actual,
             tiempo_parado=self.tiempo_parado,
             tiempo_movimiento=self.tiempo_movimiento,
             total_euros=self.total_euros
@@ -201,7 +202,9 @@ class Taximetro:
 
     def preguntar_nueva_carrera(self):
         nueva_carrera = messagebox.askyesno("Nueva carrera", "¿Deseas iniciar una nueva carrera?")
-        if not nueva_carrera:
+        if nueva_carrera:
+            self.iniciar_carrera(self.root)
+        else:
             self.root.destroy()
     # Define el método "preguntar_nueva_carrera", que muestra un mensaje para preguntar al usuario si desea iniciar una nueva carrera. Si el usuario responde "Sí", se inicia una nueva carrera. Si el usuario responde "No", se cierra la aplicación.
 
