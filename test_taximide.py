@@ -5,7 +5,7 @@ import sqlite3
 from io import StringIO
 import sys
 
-from taximetro import Taximetro
+from taximide import Taximetro
 
 class TestTaximetro(unittest.TestCase):
     
