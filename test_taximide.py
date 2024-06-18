@@ -2,9 +2,7 @@ import unittest
 from unittest.mock import Mock, patch
 import time
 import sqlite3
-from tkinter import simpledialog
-from io import StringIO
-import sys
+from tkinter import messagebox, simpledialog
 
 from taximide import Taximetro
 
@@ -14,6 +12,7 @@ class TestTaximetro(unittest.TestCase):
         # Configuración inicial para cada prueba
         self.taximetro = Taximetro(contraseña='testpass')
         self.root_mock = Mock()
+        self.taximetro.root = self.root_mock  # Añadido para evitar errores de referencia a 'root'
 
     @patch('time.time', return_value=1000000.0)
     def test_autenticar_correctamente(self, mock_time):

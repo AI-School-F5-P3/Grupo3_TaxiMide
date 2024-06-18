@@ -7,9 +7,8 @@ import sqlite3
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', handlers=[
     logging.FileHandler("taximetro.log"), 
-    logging.StreamHandler()  
+    logging.StreamHandler()
 ])
-# Configuramos el módulo "logging" para registrar eventos en un archivo ("taximetro.log") y en la consola. El formato del registro incluye la hora, el nivel de severidad y el mensaje.  
 
 class Taximetro:
     def __init__(self, contraseña, root=None):
@@ -28,31 +27,29 @@ class Taximetro:
         self.root = root if root else tk.Tk()
         self.crear_tabla_registros()
         logging.info("Taxímetro iniciado con tarifas por defecto y contraseña establecida.")
-        # Inicializa variables de la instancia, incluidas las tarifas, el estado del taxímetro, la autenticación, la conexión a la base de datos. Llama al método "crear_tabla_registros" para configurar la base de datos y registra un mensaje de inicio.
 
-    def iniciar_carrera(self, root):
-        self.autenticar(root)
+    def iniciar_carrera(self):
+        self.autenticar()
         if not self.autenticado:
             return
         
-        self.root = root
         self.root.title("Taxímetro Digital")
         self.root.geometry("400x300")
         self.root.configure(bg="black")
 
-        self.estado_label = tk.Label(root, text="Taxi en parado.", font=("Helvetica", 20), fg="white", bg="black")
+        self.estado_label = tk.Label(self.root, text="Taxi en parado.", font=("Helvetica", 20), fg="white", bg="black")
         self.estado_label.pack(pady=10)
 
-        self.tarifa_parado_label = tk.Label(root, text=f"Tarifa en parado: {self.tarifa_parado:.2f} €/minuto", font=("Helvetica", 16), fg="white", bg="black")
+        self.tarifa_parado_label = tk.Label(self.root, text=f"Tarifa en parado: {self.tarifa_parado:.2f} €/minuto", font=("Helvetica", 16), fg="white", bg="black")
         self.tarifa_parado_label.pack()
 
-        self.tarifa_movimiento_label = tk.Label(root, text=f"Tarifa en movimiento: {self.tarifa_movimiento:.2f} €/minuto", font=("Helvetica", 16), fg="white", bg="black")
+        self.tarifa_movimiento_label = tk.Label(self.root, text=f"Tarifa en movimiento: {self.tarifa_movimiento:.2f} €/minuto", font=("Helvetica", 16), fg="white", bg="black")
         self.tarifa_movimiento_label.pack()
 
         self.total_label = tk.Label(self.root, text="Total a cobrar: 0.00 euros", font=("Helvetica", 18), fg="white", bg="black")
         self.total_label.pack(pady=10)
 
-        button_frame = tk.Frame(root, bg="red")
+        button_frame = tk.Frame(self.root, bg="red")
         button_frame.pack(pady=10)
 
         self.boton_marcha = tk.Button(button_frame, text="Marcha", font=("Helvetica", 14, "bold"), command=self.iniciar_movimiento, width=12, bg="white", fg="black")
@@ -70,7 +67,7 @@ class Taximetro:
         self.boton_cambiar_contraseña = tk.Button(button_frame, text="Cambiar contraseña", font=("Helvetica", 14, "bold"), command=self.cambiar_contraseña, width=18, bg="white", fg="black")
         self.boton_cambiar_contraseña.grid(row=2, column=0, columnspan=2, pady=5)
 
-    def autenticar(self, root):
+    def autenticar(self):
         intentos = 3
         while intentos > 0:
             if not self.autenticado:
@@ -108,7 +105,6 @@ class Taximetro:
             logging.info("Tabla 'registros' creada correctamente.")
         except sqlite3.Error as e:
             logging.error(f"Error al crear la tabla 'registros': {e}")
-    # Definimos el método "crear_tabla_registros", que crea una tabla en la base de datos para almacenar los registros de las carreras.
 
     def insertar_registro(self, tiempo_inicio, tiempo_fin, tiempo_parado, tiempo_movimiento, total_euros):
         try:
@@ -121,7 +117,6 @@ class Taximetro:
             logging.info("Registro insertado correctamente en la tabla 'registros'.")
         except sqlite3.Error as e:
             logging.error(f"Error al insertar registro en la tabla 'registros': {e}")
-    # Definimos el método "insertar_registro", que inserta un registro en la tabla "registros" de la base de datos.
 
     def configurar_tarifas(self):
         if not self.autenticado:
@@ -158,7 +153,7 @@ class Taximetro:
         else:
             logging.warning("La nueva contraseña no coincide con la confirmación.")
             messagebox.showerror("Error", "La nueva contraseña no coincide con la confirmación.")
-        
+
     def _cambiar_estado(self, tiempo_actual, en_movimiento):
         tiempo_transcurrido = tiempo_actual - self.tiempo_ultimo_cambio
         if self.en_movimiento:
@@ -171,42 +166,24 @@ class Taximetro:
         estado = "movimiento" if en_movimiento else "parado"
         self.estado_label.config(text=f"Taxi en {estado}.")
         logging.info(f"Taxi en {estado}.")
-    # Define el método "_cambiar_estado", que actualiza el estado del taxi (parado o en movimiento) y el tiempo transcurrido desde el último cambio de estado. 
 
     def iniciar_movimiento(self):
         self._cambiar_estado(time.time(), True)
-    # Define el método "iniciar_movimiento", que actualiza el estado del taxi a "en movimiento" y actualiza el tiempo transcurrido desde el último cambio de estado.
 
     def detener_movimiento(self):
         self._cambiar_estado(time.time(), False)
-    # Define el método "detener_movimiento", que actualiza el estado del taxi a "parado" y actualiza el tiempo transcurrido desde el último cambio de estado.
-    
 
     def finalizar_carrera(self):
         tiempo_actual = time.time()
-        tiempo_inicio = self.tiempo_ultimo_cambio - (self.tiempo_parado + self.tiempo_movimiento)
         self._cambiar_estado(tiempo_actual, self.en_movimiento)
-        self.total_euros = (self.tiempo_movimiento * self.tarifa_movimiento) + (self.tiempo_parado * self.tarifa_parado)
+        self.tiempo_total = self.tiempo_parado + self.tiempo_movimiento
+        self.total_euros = (self.tiempo_parado / 60) * self.tarifa_parado + (self.tiempo_movimiento / 60) * self.tarifa_movimiento
+        logging.info(f"Carrera finalizada. Tiempo total parado: {self.tiempo_parado}, Tiempo total movimiento: {self.tiempo_movimiento}, Total a cobrar: {self.total_euros:.2f} euros.")
         self.total_label.config(text=f"Total a cobrar: {self.total_euros:.2f} euros")
-        messagebox.showinfo("Carrera finalizada", f"Total a cobrar: {self.total_euros:.2f} euros")
-        self.insertar_registro(
-            tiempo_inicio=tiempo_inicio,
-            tiempo_fin=tiempo_actual,
-            tiempo_parado=self.tiempo_parado,
-            tiempo_movimiento=self.tiempo_movimiento,
-            total_euros=self.total_euros
-        )
-        self.resetear_valores()
+        tiempo_inicio = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(tiempo_actual - self.tiempo_total))
+        tiempo_fin = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(tiempo_actual))
+        self.insertar_registro(tiempo_inicio, tiempo_fin, self.tiempo_parado, self.tiempo_movimiento, self.total_euros)
         self.preguntar_nueva_carrera()
-    # Define el método "finalizar_carrera", que calcula el total a cobrar, muestra el total al usuario, inserta el registro en la base de datos, resetea los valores y pregunta al usuario si desea iniciar una nueva carrera.
-
-    def preguntar_nueva_carrera(self):
-        respuesta = messagebox.askyesno("Nueva carrera", "¿Quieres iniciar una nueva carrera?")
-        if respuesta:
-            self.resetear_valores()
-        else:
-            self.root.destroy()
-    # Define el método "preguntar_nueva_carrera", que muestra un mensaje para preguntar al usuario si desea iniciar una nueva carrera. Si el usuario responde "Sí", se inicia una nueva carrera. Si el usuario responde "No", se cierra la aplicación.
 
     def resetear_valores(self):
         self.tiempo_total = 0
@@ -215,13 +192,18 @@ class Taximetro:
         self.tiempo_ultimo_cambio = time.time()
         self.tiempo_parado = 0
         self.tiempo_movimiento = 0
-    # Define el método "resetear_valores", que resetea los valores de tiempo y total a sus valores iniciales.
+
+    def preguntar_nueva_carrera(self):
+        respuesta = messagebox.askyesno("Nueva carrera", "¿Quieres iniciar una nueva carrera?")
+        if respuesta:
+            self.resetear_valores()
+        else:
+            self.root.destroy()
 
     def __del__(self):
         if self.conexion_bd:
             self.conexion_bd.close()
-            logging.info("Conexión a la base de datos cerrada correctamente.")
-    # Define el método "__del__", que cierra la conexión a la base de datos cuando se destruye la instancia del taxímetro.
+            logging.info("Conexión a la base de datos cerrada.")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Programa Taxímetro Digital")
@@ -231,4 +213,3 @@ if __name__ == "__main__":
     taximetro = Taximetro(contraseña=args.password)
     taximetro.iniciar_carrera()
     taximetro.root.mainloop()
-# El bloque principal del programa se ejecuta si el script se ejecuta directamente. Analiza los argumentos de la línea de comandos, crea una instancia del "Taxímetro" con la contraseña proporcionada, inicia la interfaz gráfica y entra en el bucle principal de "tkinter".
