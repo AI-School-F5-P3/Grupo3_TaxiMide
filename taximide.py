@@ -25,6 +25,7 @@ class Taximetro:
         self.contraseña = contraseña
         self.autenticado = False
         self.conexion_bd = None
+        self.estado_label = None
         self.crear_tabla_registros()
         logging.info("Taxímetro iniciado con tarifas por defecto y contraseña establecida.")
         # Inicializa variables de la instancia, incluidas las tarifas, el estado del taxímetro, la autenticación y la conexión a la base de datos. Llama al método "crear_tabla_registros" para configurar la base de datos y registra un mensaje de inicio.

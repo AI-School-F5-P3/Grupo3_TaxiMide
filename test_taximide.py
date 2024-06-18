@@ -2,6 +2,8 @@ import unittest
 from unittest.mock import Mock, patch
 import time
 import sqlite3
+import tkinter as tk
+from tkinter import messagebox, simpledialog
 from io import StringIO
 import sys
 
