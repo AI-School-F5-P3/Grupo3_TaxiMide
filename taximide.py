@@ -30,12 +30,11 @@ class Taximetro:
         logging.info("Taxímetro iniciado con tarifas por defecto y contraseña establecida.")
         # Inicializa variables de la instancia, incluidas las tarifas, el estado del taxímetro, la autenticación, la conexión a la base de datos. Llama al método "crear_tabla_registros" para configurar la base de datos y registra un mensaje de inicio.
 
-    def iniciar_carrera(self, root):
-        self.autenticar(root)
+    def iniciar_carrera(self):
+        self.autenticar()
         if not self.autenticado:
             return
         
-        self.root = root
         self.root.title("Taxímetro Digital")
         self.root.geometry("400x300")
         self.root.configure(bg="black")
@@ -180,33 +179,18 @@ class Taximetro:
     def detener_movimiento(self):
         self._cambiar_estado(time.time(), False)
     # Define el método "detener_movimiento", que actualiza el estado del taxi a "parado" y actualiza el tiempo transcurrido desde el último cambio de estado.
-    
 
     def finalizar_carrera(self):
         tiempo_actual = time.time()
-        tiempo_inicio = self.tiempo_ultimo_cambio - (self.tiempo_parado + self.tiempo_movimiento)
         self._cambiar_estado(tiempo_actual, self.en_movimiento)
-        self.total_euros = (self.tiempo_movimiento * self.tarifa_movimiento) + (self.tiempo_parado * self.tarifa_parado)
+        self.tiempo_total = self.tiempo_parado + self.tiempo_movimiento
+        self.total_euros = (self.tiempo_parado / 60) * self.tarifa_parado + (self.tiempo_movimiento / 60) * self.tarifa_movimiento
+        logging.info(f"Carrera finalizada. Tiempo total parado: {self.tiempo_parado}, Tiempo total movimiento: {self.tiempo_movimiento}, Total a cobrar: {self.total_euros:.2f} euros.")
         self.total_label.config(text=f"Total a cobrar: {self.total_euros:.2f} euros")
-        messagebox.showinfo("Carrera finalizada", f"Total a cobrar: {self.total_euros:.2f} euros")
-        self.insertar_registro(
-            tiempo_inicio=tiempo_inicio,
-            tiempo_fin=tiempo_actual,
-            tiempo_parado=self.tiempo_parado,
-            tiempo_movimiento=self.tiempo_movimiento,
-            total_euros=self.total_euros
-        )
-        self.resetear_valores()
+        tiempo_inicio = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(tiempo_actual - self.tiempo_total))
+        tiempo_fin = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(tiempo_actual))
+        self.insertar_registro(tiempo_inicio, tiempo_fin, self.tiempo_parado, self.tiempo_movimiento, self.total_euros)
         self.preguntar_nueva_carrera()
-    # Define el método "finalizar_carrera", que calcula el total a cobrar, muestra el total al usuario, inserta el registro en la base de datos, resetea los valores y pregunta al usuario si desea iniciar una nueva carrera.
-
-    def preguntar_nueva_carrera(self):
-        respuesta = messagebox.askyesno("Nueva carrera", "¿Quieres iniciar una nueva carrera?")
-        if respuesta:
-            self.resetear_valores()
-        else:
-            self.root.destroy()
-    # Define el método "preguntar_nueva_carrera", que muestra un mensaje para preguntar al usuario si desea iniciar una nueva carrera. Si el usuario responde "Sí", se inicia una nueva carrera. Si el usuario responde "No", se cierra la aplicación.
 
     def resetear_valores(self):
         self.tiempo_total = 0
@@ -215,7 +199,13 @@ class Taximetro:
         self.tiempo_ultimo_cambio = time.time()
         self.tiempo_parado = 0
         self.tiempo_movimiento = 0
-    # Define el método "resetear_valores", que resetea los valores de tiempo y total a sus valores iniciales.
+
+    def preguntar_nueva_carrera(self):
+        respuesta = messagebox.askyesno("Nueva carrera", "¿Quieres iniciar una nueva carrera?")
+        if respuesta:
+            self.resetear_valores()
+        else:
+            self.root.destroy()
 
     def __del__(self):
         if self.conexion_bd:

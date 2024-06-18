@@ -13,6 +13,7 @@ class TestTaximetro(unittest.TestCase):
         self.taximetro = Taximetro(contraseña='testpass')
         self.root_mock = Mock()
         self.taximetro.root = self.root_mock  # Añadido para evitar errores de referencia a 'root'
+        self.taximetro.iniciar_carrera()  # Proporciona el argumento 'root' al llamar iniciar_carrera
 
     @patch('time.time', return_value=1000000.0)
     def test_autenticar_correctamente(self, mock_time):
@@ -72,7 +73,7 @@ class TestTaximetro(unittest.TestCase):
     @patch('time.time', side_effect=[1000000.0, 1000000.0 + 900])
     def test_finalizar_carrera(self, mock_time):
         # Prueba para verificar el cálculo del total y la inserción de registros al finalizar la carrera
-        self.taximetro._cambiar_estado(mock_time.side_effect[0], True)  # Iniciar en estado de movimiento
+        self.taximetro._cambiar_estado(mock_time.return_value, True)  # Iniciar en estado de movimiento
         self.taximetro.finalizar_carrera()
         # Asumimos tarifas de prueba para 15 minutos de movimiento
         esperado_total_euros = (900 / 60) * self.taximetro.tarifa_movimiento
