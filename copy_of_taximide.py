@@ -1,4 +1,4 @@
-# En esta versión 8 el programa guarda en una base de datos (sqlite3) los registros de carreras pasadas
+import hashlib
 import time
 import logging
 import argparse
@@ -10,7 +10,6 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
     logging.FileHandler("taximetro.log"), 
     logging.StreamHandler()  
 ])
-# Configuramos el módulo "logging" para registrar eventos en un archivo ("taximetro.log") y en la consola. El formato del registro incluye la hora, el nivel de severidad y el mensaje.  
 
 class Taximetro:
     def __init__(self, contraseña):
@@ -22,12 +21,23 @@ class Taximetro:
         self.tiempo_ultimo_cambio = time.time()
         self.tiempo_parado = 0
         self.tiempo_movimiento = 0
-        self.contraseña = contraseña
+        self.password_hash = self.hash_password(contraseña)
+        self.password_plaintext = contraseña
         self.autenticado = False
         self.conexion_bd = None
         self.crear_tabla_registros()
         logging.info("Taxímetro iniciado con tarifas por defecto y contraseña establecida.")
-        # Inicializa variables de la instancia, incluidas las tarifas, el estado del taxímetro, la autenticación y la conexión a la base de datos. Llama al método "crear_tabla_registros" para configurar la base de datos y registra un mensaje de inicio.
+        
+    def hash_password(self, password):
+        password_bytes = password.encode('utf-8')
+        
+        hasher = hashlib.sha256()
+        
+        hasher.update(password_bytes)
+        
+        password_hash = hasher.hexdigest()
+        
+        return password_hash
 
     def iniciar_carrera(self, root):
         self.autenticar(root)
@@ -73,8 +83,8 @@ class Taximetro:
         intentos = 3
         while intentos > 0:
             if not self.autenticado:
-                contraseña_ingresada = simpledialog.askstring("Autenticación", "Ingresa la contraseña para continuar:", show='*')
-                if contraseña_ingresada == self.contraseña:
+                entered_password = simpledialog.askstring("Autenticación", "Ingresa la contraseña para continuar:", show='*')
+                if self.verificar_password(entered_password):
                     self.autenticado = True
                     logging.info("Contraseña correcta. Acceso concedido.")
                 else:
@@ -88,6 +98,9 @@ class Taximetro:
             logging.error("Número máximo de intentos alcanzado. Cierre del programa.")
             messagebox.showerror("Error", "Número máximo de intentos alcanzado. Cierre del programa.")
             root.destroy()
+    
+    def verificar_password(self, entered_password):
+        return entered_password == self.password_plaintext or self.hash_password(entered_password) == self.password_hash
 
     def crear_tabla_registros(self):
         try:
@@ -107,8 +120,7 @@ class Taximetro:
             logging.info("Tabla 'registros' creada correctamente.")
         except sqlite3.Error as e:
             logging.error(f"Error al crear la tabla 'registros': {e}")
-    # Definimos el método "crear_tabla_registros", que crea una tabla en la base de datos para almacenar los registros de las carreras.
-
+    
     def insertar_registro(self, tiempo_inicio, tiempo_fin, tiempo_parado, tiempo_movimiento, total_euros):
         try:
             cursor = self.conexion_bd.cursor()
@@ -120,7 +132,7 @@ class Taximetro:
             logging.info("Registro insertado correctamente en la tabla 'registros'.")
         except sqlite3.Error as e:
             logging.error(f"Error al insertar registro en la tabla 'registros': {e}")
-    # Definimos el método "insertar_registro", que inserta un registro en la tabla "registros" de la base de datos.
+
 
     def configurar_tarifas(self):
         if not self.autenticado:
@@ -147,11 +159,11 @@ class Taximetro:
             messagebox.showerror("Error", "No se ha autenticado. Debes autenticarte para cambiar la contraseña.")
             return
 
-        nueva_contraseña = simpledialog.askstring("Cambiar contraseña", "Introduce la nueva contraseña:", show='*')
-        confirmacion_contraseña = simpledialog.askstring("Cambiar contraseña", "Confirma la nueva contraseña:", show='*')
+        new_password = simpledialog.askstring("Cambiar contraseña", "Introduce la nueva contraseña:", show='*')
+        confirm_password = simpledialog.askstring("Cambiar contraseña", "Confirma la nueva contraseña:", show='*')
 
-        if nueva_contraseña == confirmacion_contraseña:
-            self.contraseña = nueva_contraseña
+        if new_password == confirm_password:
+            self.password_hash = self.hash_password(new_password)
             logging.info("Contraseña cambiada exitosamente.")
             messagebox.showinfo("Éxito", "Contraseña cambiada exitosamente.")
         else:
@@ -170,16 +182,13 @@ class Taximetro:
         estado = "movimiento" if en_movimiento else "parado"
         self.estado_label.config(text=f"Taxi en {estado}.")
         logging.info(f"Taxi en {estado}.")
-    # Define el método "_cambiar_estado", que actualiza el estado del taxi (parado o en movimiento) y el tiempo transcurrido desde el último cambio de estado. 
-
+    
     def iniciar_movimiento(self):
         self._cambiar_estado(time.time(), True)
-    # Define el método "iniciar_movimiento", que actualiza el estado del taxi a "en movimiento" y actualiza el tiempo transcurrido desde el último cambio de estado.
-
+    
     def detener_movimiento(self):
         self._cambiar_estado(time.time(), False)
-    # Define el método "detener_movimiento", que actualiza el estado del taxi a "parado" y actualiza el tiempo transcurrido desde el último cambio de estado.
-    
+       
 
     def finalizar_carrera(self):
         tiempo_actual = time.time()
@@ -196,14 +205,12 @@ class Taximetro:
         )
         self.resetear_valores()
         self.preguntar_nueva_carrera()
-    # Define el método "finalizar_carrera", que calcula el total a cobrar, muestra el total al usuario, inserta el registro en la base de datos, resetea los valores y pregunta al usuario si desea iniciar una nueva carrera.
-
+    
     def preguntar_nueva_carrera(self):
         nueva_carrera = messagebox.askyesno("Nueva carrera", "¿Deseas iniciar una nueva carrera?")
         if not nueva_carrera:
             self.root.destroy()
-    # Define el método "preguntar_nueva_carrera", que muestra un mensaje para preguntar al usuario si desea iniciar una nueva carrera. Si el usuario responde "Sí", se inicia una nueva carrera. Si el usuario responde "No", se cierra la aplicación.
-
+    
     def resetear_valores(self):
         self.tiempo_total = 0
         self.total_euros = 0
@@ -211,24 +218,20 @@ class Taximetro:
         self.tiempo_ultimo_cambio = time.time()
         self.tiempo_parado = 0
         self.tiempo_movimiento = 0
-    # Define el método "resetear_valores", que resetea los valores de tiempo y total a sus valores iniciales.
-
+    
     def __del__(self):
         if self.conexion_bd:
             self.conexion_bd.close()
             logging.info("Conexión a la base de datos cerrada correctamente.")
-    # Define el método "__del__", que cierra la conexión a la base de datos cuando se destruye la instancia del taxímetro.
-
+    
 def parse_args():
     parser = argparse.ArgumentParser(description='Taxímetro digital - Aplicación GUI')
-    parser.add_argument('--contraseña', type=str, default='1234', help='Contraseña para configurar tarifas (por defecto: "1234")')
+    parser.add_argument('--password', type=str, default='1234', help='Contraseña para configurar tarifas (por defecto: "1234")')
     return parser.parse_args()
-# Define la función "parse_args", que analiza los argumentos de la línea de comandos para obtener la contraseña. 
 
 if __name__ == "__main__":
     args = parse_args()
-    taximetro = Taximetro(contraseña=args.contraseña)
+    taximetro = Taximetro(args.password)
     root = tk.Tk()
     taximetro.iniciar_carrera(root)
     root.mainloop()
-# El bloque principal del programa se ejecuta si el script se ejecuta directamente. Analiza los argumentos de la línea de comandos, crea una instancia del "Taxímetro" con la contraseña proporcionada, inicia la interfaz gráfica y entra en el bucle principal de "tkinter".
