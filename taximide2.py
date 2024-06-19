@@ -1,3 +1,4 @@
+# En esta versión abre solo una ventana de tkinter
 import time
 import logging
 import argparse
@@ -12,7 +13,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 # Configuramos el módulo "logging" para registrar eventos en un archivo ("taximetro.log") y en la consola. El formato del registro incluye la hora, el nivel de severidad y el mensaje.  
 
 class Taximetro:
-    def __init__(self, contraseña, root=None):
+    def __init__(self, contraseña):
         self.tarifa_parado = 0.02
         self.tarifa_movimiento = 0.05
         self.tiempo_total = 0
@@ -24,11 +25,9 @@ class Taximetro:
         self.contraseña = contraseña
         self.autenticado = False
         self.conexion_bd = None
-        self.estado_label = None
-        self.root = root if root else tk.Tk()
         self.crear_tabla_registros()
         logging.info("Taxímetro iniciado con tarifas por defecto y contraseña establecida.")
-        # Inicializa variables de la instancia, incluidas las tarifas, el estado del taxímetro, la autenticación, la conexión a la base de datos. Llama al método "crear_tabla_registros" para configurar la base de datos y registra un mensaje de inicio.
+        # Inicializa variables de la instancia, incluidas las tarifas, el estado del taxímetro, la autenticación y la conexión a la base de datos. Llama al método "crear_tabla_registros" para configurar la base de datos y registra un mensaje de inicio.
 
     def iniciar_carrera(self, root):
         self.autenticar(root)
@@ -49,7 +48,7 @@ class Taximetro:
         self.tarifa_movimiento_label = tk.Label(root, text=f"Tarifa en movimiento: {self.tarifa_movimiento:.2f} €/minuto", font=("Helvetica", 16), fg="white", bg="black")
         self.tarifa_movimiento_label.pack()
 
-        self.total_label = tk.Label(self.root, text="Total a cobrar: 0.00 euros", font=("Helvetica", 18), fg="white", bg="black")
+        self.total_label = tk.Label(root, text="Total a cobrar: 0.00 euros", font=("Helvetica", 18), fg="white", bg="black")
         self.total_label.pack(pady=10)
 
         button_frame = tk.Frame(root, bg="red")
@@ -88,7 +87,7 @@ class Taximetro:
         if intentos == 0:
             logging.error("Número máximo de intentos alcanzado. Cierre del programa.")
             messagebox.showerror("Error", "Número máximo de intentos alcanzado. Cierre del programa.")
-            self.root.destroy()
+            root.destroy()
 
     def crear_tabla_registros(self):
         try:
@@ -184,14 +183,13 @@ class Taximetro:
 
     def finalizar_carrera(self):
         tiempo_actual = time.time()
-        tiempo_inicio = self.tiempo_ultimo_cambio - (self.tiempo_parado + self.tiempo_movimiento)
         self._cambiar_estado(tiempo_actual, self.en_movimiento)
         self.total_euros = (self.tiempo_movimiento * self.tarifa_movimiento) + (self.tiempo_parado * self.tarifa_parado)
         self.total_label.config(text=f"Total a cobrar: {self.total_euros:.2f} euros")
         messagebox.showinfo("Carrera finalizada", f"Total a cobrar: {self.total_euros:.2f} euros")
         self.insertar_registro(
-            tiempo_inicio=tiempo_inicio,
-            tiempo_fin=tiempo_actual,
+            tiempo_inicio=self.tiempo_ultimo_cambio - (self.tiempo_parado + self.tiempo_movimiento),
+            tiempo_fin=self.tiempo_ultimo_cambio,
             tiempo_parado=self.tiempo_parado,
             tiempo_movimiento=self.tiempo_movimiento,
             total_euros=self.total_euros
@@ -201,10 +199,8 @@ class Taximetro:
     # Define el método "finalizar_carrera", que calcula el total a cobrar, muestra el total al usuario, inserta el registro en la base de datos, resetea los valores y pregunta al usuario si desea iniciar una nueva carrera.
 
     def preguntar_nueva_carrera(self):
-        respuesta = messagebox.askyesno("Nueva carrera", "¿Quieres iniciar una nueva carrera?")
-        if respuesta:
-            self.resetear_valores()
-        else:
+        nueva_carrera = messagebox.askyesno("Nueva carrera", "¿Deseas iniciar una nueva carrera?")
+        if not nueva_carrera:
             self.root.destroy()
     # Define el método "preguntar_nueva_carrera", que muestra un mensaje para preguntar al usuario si desea iniciar una nueva carrera. Si el usuario responde "Sí", se inicia una nueva carrera. Si el usuario responde "No", se cierra la aplicación.
 
@@ -235,4 +231,4 @@ if __name__ == "__main__":
     root = tk.Tk()
     taximetro.iniciar_carrera(root)
     root.mainloop()
-# El bloque principal del programa se ejecuta si el script se ejecuta directamente. Analiza los argumentos de la línea de comandos, crea una instancia del "Taxímetro" con la contraseña proporcionada, inicia la interfaz gráfica y entra en el bucle principal de "tkinter"
+# El bloque principal del programa se ejecuta si el script se ejecuta directamente. Analiza los argumentos de la línea de comandos, crea una instancia del "Taxímetro" con la contraseña proporcionada, inicia la interfaz gráfica y entra en el bucle principal de "tkinter".
