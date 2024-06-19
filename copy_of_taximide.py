@@ -46,37 +46,37 @@ class Taximetro:
         
         self.root = root
         self.root.title("Taxímetro Digital")
-        self.root.geometry("400x300")
-        self.root.configure(bg="black")
-
-        self.estado_label = tk.Label(root, text="Taxi en parado.", font=("Helvetica", 20), fg="white", bg="black")
+        self.root.geometry("400x400")
+        self.root.configure(bg="#242424")
+        ##242424 = black
+        self.estado_label = tk.Label(root, text="Taxi en parado.", font=("Helvetica", 20), fg="white", bg="#242424")
         self.estado_label.pack(pady=10)
 
-        self.tarifa_parado_label = tk.Label(root, text=f"Tarifa en parado: {self.tarifa_parado:.2f} €/minuto", font=("Helvetica", 16), fg="white", bg="black")
+        self.tarifa_parado_label = tk.Label(root, text=f"Tarifa en parado: {self.tarifa_parado:.2f} €/minuto", font=("Helvetica", 16), fg="white", bg="#242424")
         self.tarifa_parado_label.pack()
 
-        self.tarifa_movimiento_label = tk.Label(root, text=f"Tarifa en movimiento: {self.tarifa_movimiento:.2f} €/minuto", font=("Helvetica", 16), fg="white", bg="black")
+        self.tarifa_movimiento_label = tk.Label(root, text=f"Tarifa en movimiento: {self.tarifa_movimiento:.2f} €/minuto", font=("Helvetica", 16), fg="white", bg="#242424")
         self.tarifa_movimiento_label.pack()
 
-        self.total_label = tk.Label(root, text="Total a cobrar: 0.00 euros", font=("Helvetica", 18), fg="white", bg="black")
+        self.total_label = tk.Label(root, text="Total a cobrar: 0.00 euros", font=("Helvetica", 18), fg="white", bg="#242424")
         self.total_label.pack(pady=10)
 
-        button_frame = tk.Frame(root, bg="red")
+        button_frame = tk.Frame(root, bg="#242424") ##007095 = blue
         button_frame.pack(pady=10)
 
-        self.boton_marcha = tk.Button(button_frame, text="Marcha", font=("Helvetica", 14, "bold"), command=self.iniciar_movimiento, width=12, bg="white", fg="black")
+        self.boton_marcha = tk.Button(button_frame, text="Marcha", font=("Helvetica", 14, "bold"), command=self.iniciar_movimiento, width=12, bg="#d1f5b4", fg="#007095")
         self.boton_marcha.grid(row=0, column=0, padx=5, pady=5)
-
-        self.boton_parada = tk.Button(button_frame, text="Parada", font=("Helvetica", 14, "bold"), command=self.detener_movimiento, width=12, bg="white", fg="black")
+        ##d1f5b4 = light green
+        self.boton_parada = tk.Button(button_frame, text="Parada", font=("Helvetica", 14, "bold"), command=self.detener_movimiento, width=12, bg="#d1f5b4", fg="#007095")
         self.boton_parada.grid(row=0, column=1, padx=5)
 
-        self.boton_fin = tk.Button(button_frame, text="Fin", font=("Helvetica", 14, "bold"), command=self.finalizar_carrera, width=12, bg="white", fg="black")
+        self.boton_fin = tk.Button(button_frame, text="Fin", font=("Helvetica", 14, "bold"), command=self.finalizar_carrera, width=12, bg="#d1f5b4", fg="#007095")
         self.boton_fin.grid(row=1, column=0, padx=5, pady=5)
 
-        self.boton_configurar = tk.Button(button_frame, text="Configurar tarifas", font=("Helvetica", 14, "bold"), command=self.configurar_tarifas, width=18, bg="white", fg="black")
+        self.boton_configurar = tk.Button(button_frame, text="Configurar tarifas", font=("Helvetica", 14, "bold"), command=self.configurar_tarifas, width=18, bg="#d1f5b4", fg="#007095")
         self.boton_configurar.grid(row=1, column=1, padx=5, pady=5)
 
-        self.boton_cambiar_contraseña = tk.Button(button_frame, text="Cambiar contraseña", font=("Helvetica", 14, "bold"), command=self.cambiar_contraseña, width=18, bg="white", fg="black")
+        self.boton_cambiar_contraseña = tk.Button(button_frame, text="Cambiar contraseña", font=("Helvetica", 14, "bold"), command=self.cambiar_contraseña, width=18, bg="#d1f5b4", fg="#007095")
         self.boton_cambiar_contraseña.grid(row=2, column=0, columnspan=2, pady=5)
 
     def autenticar(self, root):
