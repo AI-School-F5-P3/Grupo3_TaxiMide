@@ -80,3 +80,6 @@
 2024-06-19 09:05:49,725 - INFO - Taxímetro iniciado con tarifas por defecto y contraseña establecida.
 2024-06-19 09:05:52,397 - INFO - Contraseña correcta. Acceso concedido.
 2024-06-19 09:08:44,627 - INFO - Conexión a la base de datos cerrada correctamente.
+2024-06-19 09:08:53,295 - INFO - Tabla 'registros' creada correctamente.
+2024-06-19 09:08:53,296 - INFO - Taxímetro iniciado con tarifas por defecto y contraseña establecida.
+2024-06-19 09:08:56,345 - INFO - Contraseña correcta. Acceso concedido.
