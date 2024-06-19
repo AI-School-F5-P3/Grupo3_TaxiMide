@@ -25,6 +25,8 @@ class Taximetro:
         self.contraseña = contraseña
         self.autenticado = False
         self.conexion_bd = None
+        self.tiempo_transcurrido = 0
+        self.dinero_a_pagar = 0.00
         self.crear_tabla_registros()
         logging.info("Taxímetro iniciado con tarifas por defecto y contraseña establecida.")
         # Inicializa variables de la instancia, incluidas las tarifas, el estado del taxímetro, la autenticación y la conexión a la base de datos. Llama al método "crear_tabla_registros" para configurar la base de datos y registra un mensaje de inicio.
@@ -40,27 +42,31 @@ class Taximetro:
 
         self.frame_izquierda = tk.Frame(self.root, width=200,bg="deepskyblue2" )
         self.frame_izquierda.pack(side=tk.LEFT, fill=tk.Y)
-        self.frame_derecha = tk.Frame(self.root, bg="snow")
+        self.frame_derecha = tk.Frame(self.root, bg="grey24")
         self.frame_derecha.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
-
-
-        self.estado_label = tk.Label(root, text="Taxi en parado.", font=("Helvetica", 20), fg="grey26")
+        self.frame_derecha_arriba = tk.Frame(self.frame_derecha, height=400, bg="light goldenrod")
+        self.frame_derecha_arriba.pack(side=tk.TOP, fill=tk.BOTH)
+        
+        self.estado_label = tk.Label(self.frame_derecha_arriba, text="Taxi en parado.", font=("Helvetica", 20), fg="deepskyblue4")
         self.estado_label.pack(pady=10)
 
-        self.tarifa_parado_label = tk.Label(root, text=f"Tarifa en parado: {self.tarifa_parado:.2f} €/minuto", font=("Helvetica", 16), fg="grey26")
+        self.tarifa_parado_label = tk.Label(self.frame_derecha, text=f"Tarifa en parado: {self.tarifa_parado:.2f} €/minuto", font=("Helvetica", 16), fg="deepskyblue4")
         self.tarifa_parado_label.pack()
 
-        self.tarifa_movimiento_label = tk.Label(root, text=f"Tarifa en movimiento: {self.tarifa_movimiento:.2f} €/minuto", font=("Helvetica", 16), fg="grey26")
+        self.tarifa_movimiento_label = tk.Label(self.frame_derecha, text=f"Tarifa en movimiento: {self.tarifa_movimiento:.2f} €/minuto", font=("Helvetica", 16), fg="deepskyblue4")
         self.tarifa_movimiento_label.pack()
 
-        #self.total_label = tk.Label(root, text="Total a cobrar: 0.00 euros", font=("Helvetica", 18), fg="white", bg="black")
-        #self.total_label.pack(pady=10)
+        self.total_label = tk.Label(self.frame_derecha, text="Total a cobrar: 0.00 euros", font=("Helvetica", 18), fg="deepskyblue4")
+        self.total_label.pack(pady=10)
 
         self.logo_image = tk.PhotoImage(file="logo.png").subsample(3, 3)
         self.logo_label = tk.Label(self.frame_izquierda,image=self.logo_image, bg="#3498db")
         self.logo_label.pack(pady=5)
         self.boton_marcha = tk.Button(self.frame_izquierda, text="Marcha", font=("Helvetica", 14, "bold"), command=self.iniciar_movimiento, width=18, bg="light goldenrod", fg="black")
         self.boton_marcha.pack(pady=5)
+
+        self.tiempo_label = tk.Label(self.frame_derecha, text="Tiempo transcurrido: 0.00 segundos", font=("Helvetica", 16), fg="deepskyblue4")
+        self.tiempo_label.pack()
 
         self.boton_parada = tk.Button(self.frame_izquierda, text="Parada", font=("Helvetica", 14, "bold"), command=self.detener_movimiento, width=18, bg="light goldenrod", fg="black")
         self.boton_parada.pack(pady=5)
@@ -73,6 +79,9 @@ class Taximetro:
 
         self.boton_cambiar_contraseña = tk.Button(self.frame_izquierda, text="Cambiar contraseña", font=("Helvetica", 14, "bold"), command=self.cambiar_contraseña, width=18, bg="light goldenrod", fg="black")
         self.boton_cambiar_contraseña.pack(pady=5)
+
+        self.actualizar_interfaz()
+    
 
     def autenticar(self, root):
         intentos = 3
@@ -165,6 +174,7 @@ class Taximetro:
         
     def _cambiar_estado(self, tiempo_actual, en_movimiento):
         tiempo_transcurrido = tiempo_actual - self.tiempo_ultimo_cambio
+        self.tiempo_transcurrido += tiempo_transcurrido
         if self.en_movimiento:
             self.tiempo_movimiento += tiempo_transcurrido
         else:
@@ -190,6 +200,7 @@ class Taximetro:
         tiempo_actual = time.time()
         self._cambiar_estado(tiempo_actual, self.en_movimiento)
         self.total_euros = (self.tiempo_movimiento * self.tarifa_movimiento) + (self.tiempo_parado * self.tarifa_parado)
+        self.dinero_a_pagar = self.total_euros
         self.total_label.config(text=f"Total a cobrar: {self.total_euros:.2f} euros")
         messagebox.showinfo("Carrera finalizada", f"Total a cobrar: {self.total_euros:.2f} euros")
         self.insertar_registro(
@@ -202,7 +213,12 @@ class Taximetro:
         self.resetear_valores()
         self.preguntar_nueva_carrera()
     # Define el método "finalizar_carrera", que calcula el total a cobrar, muestra el total al usuario, inserta el registro en la base de datos, resetea los valores y pregunta al usuario si desea iniciar una nueva carrera.
+    
+    def actualizar_interfaz(self):
+        self.total_label.config(text=f"Total a cobrar: {self.dinero_a_pagar:.2f} euros")
+        self.tiempo_label.config(text=f"Tiempo transcurrido: {self.tiempo_transcurrido:.2f} segundos")
 
+        self.root.after(100, self.actualizar_interfaz)
     def preguntar_nueva_carrera(self):
         nueva_carrera = messagebox.askyesno("Nueva carrera", "¿Deseas iniciar una nueva carrera?")
         if not nueva_carrera:
