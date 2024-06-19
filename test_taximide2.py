@@ -4,7 +4,7 @@ import time
 import sqlite3
 from tkinter import messagebox, simpledialog
 
-from taximide import Taximetro
+from taximide6 import Taximetro
 
 class TestTaximetro(unittest.TestCase):
 

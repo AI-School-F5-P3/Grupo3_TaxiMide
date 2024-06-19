@@ -3,7 +3,7 @@ import time
 from unittest.mock import patch, MagicMock
 import tkinter as tk
 from tkinter import simpledialog, messagebox
-from taximide5 import Taximetro
+from taximide6 import Taximetro
 
 class TestTaximetro(unittest.TestCase):
     def setUp(self):
