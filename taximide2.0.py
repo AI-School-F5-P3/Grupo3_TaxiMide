@@ -1,4 +1,4 @@
-import hashlib
+import hashlib #importamos libreria 
 import time
 import logging
 import argparse
@@ -28,6 +28,7 @@ class Taximetro:
         self.crear_tabla_registros()
         logging.info("Taxímetro iniciado con tarifas por defecto y contraseña establecida.")
         
+        #programamos hashing de contraseñas
     def hash_password(self, password):
         password_bytes = password.encode('utf-8')
         
@@ -140,6 +141,7 @@ class Taximetro:
             messagebox.showerror("Error", "Número máximo de intentos alcanzado. Cierre del programa.")
             root.destroy()
     
+    #aseguramos que la app reconoce contraseñas introducidas no hasheadas
     def verificar_password(self, entered_password):
         return entered_password == self.password_plaintext or self.hash_password(entered_password) == self.password_hash
 
