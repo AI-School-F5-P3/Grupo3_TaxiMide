@@ -47,16 +47,16 @@ class Taximetro:
         self.frame_derecha_arriba = tk.Frame(self.frame_derecha, height=400, bg="light goldenrod")
         self.frame_derecha_arriba.pack(side=tk.TOP, fill=tk.BOTH)
         
-        self.estado_label = tk.Label(self.frame_derecha_arriba, text="Taxi en parado.", font=("Helvetica", 20), fg="deepskyblue4", bg="light goldenrod")
+        self.estado_label = tk.Label(self.frame_derecha_arriba, text="Taxi en parado.", font=("Helvetica", 20), fg="dodgerblue", bg="light goldenrod")
         self.estado_label.pack(pady=10)
 
-        self.tarifa_parado_label = tk.Label(self.frame_derecha, text=f"Tarifa en parado: {self.tarifa_parado:.2f} €/minuto", font=("Helvetica", 16), fg="deepskyblue4")
-        self.tarifa_parado_label.pack()
+        self.tarifa_parado_label = tk.Label(self.frame_derecha, text=f"Tarifa en parado: {self.tarifa_parado:.2f} €/minuto", font=("Helvetica", 16), fg="dodgerblue", bg="grey24")
+        self.tarifa_parado_label.pack(pady=10)
 
-        self.tarifa_movimiento_label = tk.Label(self.frame_derecha, text=f"Tarifa en movimiento: {self.tarifa_movimiento:.2f} €/minuto", font=("Helvetica", 16), fg="deepskyblue4")
-        self.tarifa_movimiento_label.pack()
+        self.tarifa_movimiento_label = tk.Label(self.frame_derecha, text=f"Tarifa en movimiento: {self.tarifa_movimiento:.2f} €/minuto", font=("Helvetica", 16), fg="dodgerblue", bg="grey24")
+        self.tarifa_movimiento_label.pack(pady=10)
 
-        self.total_label = tk.Label(self.frame_derecha, text="Total a cobrar: 0.00 euros", font=("Helvetica", 18), fg="deepskyblue4")
+        self.total_label = tk.Label(self.frame_derecha, text="Total a cobrar: 0.00 euros", font=("Helvetica", 18), fg="dodgerblue", bg="grey24")
         self.total_label.pack(pady=10)
 
         self.logo_image = tk.PhotoImage(file="logo.png").subsample(3, 3)
@@ -65,8 +65,8 @@ class Taximetro:
         self.boton_marcha = tk.Button(self.frame_izquierda, text="Marcha", font=("Helvetica", 14, "bold"), command=self.iniciar_movimiento, width=18, bg="light goldenrod", fg="black")
         self.boton_marcha.pack(pady=5)
 
-        self.tiempo_label = tk.Label(self.frame_derecha, text="Tiempo transcurrido: 0.00 segundos", font=("Helvetica", 16), fg="deepskyblue4")
-        self.tiempo_label.pack()
+        self.tiempo_label = tk.Label(self.frame_derecha, text="Tiempo transcurrido: 0.00 segundos", font=("Helvetica", 16), fg="dodgerblue", bg="grey24")
+        self.tiempo_label.pack(pady=10)
 
         self.boton_parada = tk.Button(self.frame_izquierda, text="Parada", font=("Helvetica", 14, "bold"), command=self.detener_movimiento, width=18, bg="light goldenrod", fg="black")
         self.boton_parada.pack(pady=5)
@@ -81,6 +81,9 @@ class Taximetro:
         self.boton_cambiar_contraseña.pack(pady=5)
 
         self.actualizar_interfaz()
+
+        self.boton_quit = tk.Button(self.frame_izquierda, text="Quit", font=("helvetica", 14, "bold"), command=root.quit, width=18, bg="light goldenrod", fg="black")
+        self.boton_quit.pack(pady=5)
     
 
     def autenticar(self, root):
