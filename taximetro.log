@@ -335,3 +335,90 @@
 2024-06-19 14:10:17,487 - INFO - Tabla 'registros' creada correctamente.
 2024-06-19 14:10:17,488 - INFO - Taxímetro iniciado con tarifas por defecto y contraseña establecida.
 2024-06-19 14:10:20,057 - INFO - Contraseña correcta. Acceso concedido.
+2024-06-19 14:58:17,781 - INFO - Tabla 'registros' creada correctamente.
+2024-06-19 14:58:17,781 - INFO - Taxímetro iniciado con tarifas por defecto y contraseña establecida.
+2024-06-19 14:58:19,809 - INFO - Contraseña correcta. Acceso concedido.
+2024-06-19 15:04:39,250 - INFO - Conexión a la base de datos cerrada correctamente.
+2024-06-19 15:04:41,760 - INFO - Tabla 'registros' creada correctamente.
+2024-06-19 15:04:41,761 - INFO - Taxímetro iniciado con tarifas por defecto y contraseña establecida.
+2024-06-19 15:04:44,039 - INFO - Contraseña correcta. Acceso concedido.
+2024-06-19 15:04:52,756 - INFO - Taxi en movimiento.
+2024-06-19 15:05:07,104 - INFO - Taxi en movimiento.
+2024-06-19 15:05:10,801 - INFO - Registro insertado correctamente en la tabla 'registros'.
+2024-06-19 15:05:17,156 - INFO - Taxi en parado.
+2024-06-19 15:05:18,647 - INFO - Registro insertado correctamente en la tabla 'registros'.
+2024-06-19 15:05:25,752 - INFO - Taxi en movimiento.
+2024-06-19 15:05:32,392 - INFO - Taxi en movimiento.
+2024-06-19 15:05:33,296 - INFO - Registro insertado correctamente en la tabla 'registros'.
+2024-06-19 15:05:34,522 - INFO - Conexión a la base de datos cerrada correctamente.
+2024-06-19 15:07:07,295 - INFO - Tabla 'registros' creada correctamente.
+2024-06-19 15:07:07,296 - INFO - Taxímetro iniciado con tarifas por defecto y contraseña establecida.
+2024-06-19 15:07:09,801 - INFO - Contraseña correcta. Acceso concedido.
+2024-06-19 15:07:17,546 - INFO - Taxi en movimiento.
+2024-06-19 15:08:43,902 - INFO - Taxi en parado.
+2024-06-19 15:08:52,688 - INFO - Taxi en parado.
+2024-06-19 15:08:58,070 - INFO - Taxi en parado.
+2024-06-19 15:10:11,284 - INFO - Conexión a la base de datos cerrada correctamente.
+2024-06-19 15:10:12,521 - INFO - Tabla 'registros' creada correctamente.
+2024-06-19 15:10:12,521 - INFO - Taxímetro iniciado con tarifas por defecto y contraseña establecida.
+2024-06-19 15:10:14,751 - INFO - Contraseña correcta. Acceso concedido.
+2024-06-19 15:10:17,081 - INFO - Taxi en parado.
+2024-06-19 15:10:20,966 - INFO - Registro insertado correctamente en la tabla 'registros'.
+2024-06-19 15:10:26,536 - INFO - Taxi en movimiento.
+2024-06-19 15:10:36,020 - INFO - Taxi en movimiento.
+2024-06-19 15:10:41,284 - INFO - Registro insertado correctamente en la tabla 'registros'.
+2024-06-19 15:11:09,398 - INFO - Tarifas actualizadas en parado: 0.06, y en movimiento: 0.50
+2024-06-19 15:12:47,154 - INFO - Taxi en parado.
+2024-06-19 15:12:49,394 - INFO - Registro insertado correctamente en la tabla 'registros'.
+2024-06-19 15:13:06,328 - INFO - Taxi en movimiento.
+2024-06-19 15:13:07,795 - INFO - Taxi en movimiento.
+2024-06-19 15:13:08,858 - INFO - Registro insertado correctamente en la tabla 'registros'.
+2024-06-19 15:13:56,681 - INFO - Conexión a la base de datos cerrada correctamente.
+2024-06-19 15:13:57,827 - INFO - Tabla 'registros' creada correctamente.
+2024-06-19 15:13:57,827 - INFO - Taxímetro iniciado con tarifas por defecto y contraseña establecida.
+2024-06-19 15:14:00,197 - INFO - Contraseña correcta. Acceso concedido.
+2024-06-19 15:16:24,175 - INFO - Taxi en movimiento.
+2024-06-19 15:16:34,695 - INFO - Contraseña cambiada exitosamente.
+2024-06-19 15:16:40,681 - INFO - Conexión a la base de datos cerrada correctamente.
+2024-06-19 15:16:51,150 - INFO - Tabla 'registros' creada correctamente.
+2024-06-19 15:16:51,150 - INFO - Taxímetro iniciado con tarifas por defecto y contraseña establecida.
+2024-06-19 15:16:53,333 - INFO - Contraseña correcta. Acceso concedido.
+2024-06-19 15:17:35,346 - INFO - Conexión a la base de datos cerrada correctamente.
+2024-06-19 15:26:21,185 - INFO - Tabla 'registros' creada correctamente.
+2024-06-19 15:26:21,186 - INFO - Taxímetro iniciado con tarifas por defecto y contraseña establecida.
+2024-06-19 15:26:23,616 - INFO - Contraseña correcta. Acceso concedido.
+2024-06-19 15:30:07,022 - INFO - Conexión a la base de datos cerrada correctamente.
+2024-06-19 15:30:08,385 - INFO - Tabla 'registros' creada correctamente.
+2024-06-19 15:30:08,386 - INFO - Taxímetro iniciado con tarifas por defecto y contraseña establecida.
+2024-06-19 15:30:12,345 - INFO - Contraseña correcta. Acceso concedido.
+2024-06-19 15:31:01,540 - INFO - Conexión a la base de datos cerrada correctamente.
+2024-06-19 15:31:02,801 - INFO - Tabla 'registros' creada correctamente.
+2024-06-19 15:31:02,802 - INFO - Taxímetro iniciado con tarifas por defecto y contraseña establecida.
+2024-06-19 15:31:05,112 - INFO - Contraseña correcta. Acceso concedido.
+2024-06-19 15:31:08,755 - INFO - Taxi en parado.
+2024-06-19 15:31:13,840 - INFO - Registro insertado correctamente en la tabla 'registros'.
+2024-06-19 15:32:08,282 - INFO - Conexión a la base de datos cerrada correctamente.
+2024-06-19 15:32:09,593 - INFO - Tabla 'registros' creada correctamente.
+2024-06-19 15:32:09,593 - INFO - Taxímetro iniciado con tarifas por defecto y contraseña establecida.
+2024-06-19 15:32:11,991 - INFO - Contraseña correcta. Acceso concedido.
+2024-06-19 15:36:30,212 - INFO - Conexión a la base de datos cerrada correctamente.
+2024-06-19 15:37:49,329 - INFO - Tabla 'registros' creada correctamente.
+2024-06-19 15:37:49,329 - INFO - Taxímetro iniciado con tarifas por defecto y contraseña establecida.
+2024-06-19 15:37:51,676 - INFO - Contraseña correcta. Acceso concedido.
+2024-06-19 15:37:54,156 - INFO - Taxi en parado.
+2024-06-19 15:37:59,588 - INFO - Registro insertado correctamente en la tabla 'registros'.
+2024-06-19 15:38:03,899 - INFO - Taxi en parado.
+2024-06-19 15:38:05,166 - INFO - Registro insertado correctamente en la tabla 'registros'.
+2024-06-19 15:38:11,095 - INFO - Taxi en parado.
+2024-06-19 15:38:14,622 - INFO - Registro insertado correctamente en la tabla 'registros'.
+2024-06-19 15:38:17,641 - INFO - Taxi en parado.
+2024-06-19 15:38:18,861 - INFO - Registro insertado correctamente en la tabla 'registros'.
+2024-06-19 15:38:23,943 - INFO - Taxi en parado.
+2024-06-19 15:38:25,199 - INFO - Registro insertado correctamente en la tabla 'registros'.
+2024-06-19 15:38:27,462 - INFO - Taxi en parado.
+2024-06-19 15:38:28,412 - INFO - Registro insertado correctamente en la tabla 'registros'.
+2024-06-19 15:41:15,328 - INFO - Taxi en parado.
+2024-06-19 15:41:17,107 - INFO - Registro insertado correctamente en la tabla 'registros'.
+2024-06-19 15:41:26,103 - INFO - Taxi en parado.
+2024-06-19 15:41:27,396 - INFO - Registro insertado correctamente en la tabla 'registros'.
+2024-06-19 15:41:29,116 - INFO - Conexión a la base de datos cerrada correctamente.

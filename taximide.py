@@ -57,7 +57,6 @@ class Taximetro:
         self.tarifa_movimiento_label.pack(pady=10)
 
         self.total_label = tk.Label(self.frame_derecha, text="Total a cobrar: 0.00 euros", font=("Helvetica", 18), fg="dodgerblue", bg="grey24")
-        self.total_label.pack(pady=10)
 
         self.logo_image = tk.PhotoImage(file="logo.png").subsample(3, 3)
         self.logo_label = tk.Label(self.frame_izquierda,image=self.logo_image, bg="#3498db")
@@ -65,14 +64,9 @@ class Taximetro:
         self.boton_marcha = tk.Button(self.frame_izquierda, text="Marcha", font=("Helvetica", 14, "bold"), command=self.iniciar_movimiento, width=18, bg="light goldenrod", fg="black")
         self.boton_marcha.pack(pady=5)
 
-        self.tiempo_label = tk.Label(self.frame_derecha, text="Tiempo transcurrido: 0.00 segundos", font=("Helvetica", 16), fg="dodgerblue", bg="grey24")
-        self.tiempo_label.pack(pady=10)
-
         self.boton_parada = tk.Button(self.frame_izquierda, text="Parada", font=("Helvetica", 14, "bold"), command=self.detener_movimiento, width=18, bg="light goldenrod", fg="black")
         self.boton_parada.pack(pady=5)
 
-        self.boton_fin = tk.Button(self.frame_izquierda, text="Fin", font=("Helvetica", 14, "bold"), command=self.finalizar_carrera, width=18, bg="light goldenrod", fg="black")
-        self.boton_fin.pack(pady=5)
 
         self.boton_configurar = tk.Button(self.frame_izquierda, text="Configurar tarifas", font=("Helvetica", 14, "bold"), command=self.configurar_tarifas, width=18, bg="light goldenrod", fg="black")
         self.boton_configurar.pack(pady=5)
@@ -80,12 +74,47 @@ class Taximetro:
         self.boton_cambiar_contraseña = tk.Button(self.frame_izquierda, text="Cambiar contraseña", font=("Helvetica", 14, "bold"), command=self.cambiar_contraseña, width=18, bg="light goldenrod", fg="black")
         self.boton_cambiar_contraseña.pack(pady=5)
 
-        self.actualizar_interfaz()
 
-        self.boton_quit = tk.Button(self.frame_izquierda, text="Quit", font=("helvetica", 14, "bold"), command=root.quit, width=18, bg="light goldenrod", fg="black")
+        self.boton_quit = tk.Button(self.frame_izquierda, text="Exit", font=("helvetica", 14, "bold"), command=root.quit, width=18, bg="light goldenrod", fg="black")
         self.boton_quit.pack(pady=5)
-    
 
+        self.canvas_tiempo = tk.Canvas(self.frame_derecha, width=300, height=50, bg="grey", highlightthickness=5)
+        self.canvas_tiempo.pack(pady=10)
+
+        self.canvas_euros = tk.Canvas(self.frame_derecha, width=300, height=50, bg="grey", highlightthickness=5)
+        self.canvas_euros.pack(pady=10)
+       
+        self.canva_fin = tk.Button(self.frame_derecha, text="Fin", activebackground="red", font=("helvetica", 14, "bold"), command=self.finalizar_carrera, width=18, fg="dodgerblue", bg="grey24")
+        self.canva_fin.pack(pady=5)
+        
+        self.actualizar_tiempo_costo()
+
+    def actualizar_tiempo_costo(self):
+        tiempo_actual = time.time()
+        tiempo_transcurrido = tiempo_actual - self.tiempo_ultimo_cambio
+        if self.en_movimiento:
+            self.tiempo_movimiento += tiempo_transcurrido
+        else:
+            self.tiempo_parado += tiempo_transcurrido
+        
+        self.tiempo_total = self.tiempo_movimiento + self.tiempo_parado
+        self.total_euros = (self.tiempo_movimiento * self.tarifa_movimiento) + (self.tiempo_parado * self.tarifa_parado)
+
+        horas, resto = divmod(self.tiempo_total, 3600)
+        minutos, segundos = divmod(resto, 60)
+        tiempo_formateado = f"{int(horas):02}:{int(minutos):02}:{int(segundos):02}"
+
+        # Actualizamos los contadores visuales en el Canvas
+        self.actualizar_canvas(self.canvas_tiempo, tiempo_formateado)
+        self.actualizar_canvas(self.canvas_euros, f"{self.total_euros:.2f} €")
+
+        self.tiempo_ultimo_cambio = tiempo_actual
+        self.root.after(1000, self.actualizar_tiempo_costo)
+
+    def actualizar_canvas(self, canvas, texto):
+        canvas.delete("all")  # Borramos todo lo dibujado previamente en el Canvas
+        canvas.create_text(150, 30, text=texto, font=("Arial", 38), fill="white")
+   
     def autenticar(self, root):
         intentos = 3
         while intentos > 0:
