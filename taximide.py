@@ -47,7 +47,7 @@ class Taximetro:
         self.frame_derecha_arriba = tk.Frame(self.frame_derecha, height=400, bg="light goldenrod")
         self.frame_derecha_arriba.pack(side=tk.TOP, fill=tk.BOTH)
         
-        self.estado_label = tk.Label(self.frame_derecha_arriba, text="Taxi en parado.", font=("Helvetica", 20), fg="deepskyblue4")
+        self.estado_label = tk.Label(self.frame_derecha_arriba, text="Taxi en parado.", font=("Helvetica", 20), fg="deepskyblue4", bg="light goldenrod")
         self.estado_label.pack(pady=10)
 
         self.tarifa_parado_label = tk.Label(self.frame_derecha, text=f"Tarifa en parado: {self.tarifa_parado:.2f} €/minuto", font=("Helvetica", 16), fg="deepskyblue4")
