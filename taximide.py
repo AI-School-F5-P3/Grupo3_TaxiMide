@@ -290,3 +290,4 @@ if __name__ == "__main__":
     taximetro.iniciar_carrera(root)
     root.mainloop()
 # El bloque principal del programa se ejecuta si el script se ejecuta directamente. Analiza los argumentos de la línea de comandos, crea una instancia del "Taxímetro" con la contraseña proporcionada, inicia la interfaz gráfica y entra en el bucle principal de "tkinter".
+#Prueba
