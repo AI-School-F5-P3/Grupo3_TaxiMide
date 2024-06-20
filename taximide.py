@@ -8,7 +8,7 @@ from tkinter import messagebox, simpledialog
 import sqlite3
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', handlers=[
-    logging.FileHandler("taximetro.log"), 
+    logging.FileHandler("taximideapp.log"), 
     logging.StreamHandler()  
 ])
 
@@ -143,6 +143,42 @@ class Taximetro:
     def verificar_password(self, entered_password):
         return entered_password == self.password_plaintext or self.hash_password(entered_password) == self.password_hash
 
+    def cambiar_contraseña(self):
+        if not self.autenticado:
+            logging.warning("No se ha autenticado. Debes autenticarte para cambiar la contraseña.")
+            messagebox.showerror("Error", "No se ha autenticado. Debes autenticarte para cambiar la contraseña.")
+            return
+        
+        while True:
+
+            new_password = simpledialog.askstring("Cambiar contraseña", "Introduce la nueva contraseña:", show='*')
+            
+            if not self.validate_password(new_password):
+                messagebox.showerror("Error", "La nueva contraseña no cumple los requisitos. Debe tener al menos 6 caracteres y solo puede contener letras, números y los caracteres . - _")
+            else:
+                break
+            
+        confirm_password = simpledialog.askstring("Cambiar contraseña", "Confirma la nueva contraseña:", show='*')
+
+        if new_password == confirm_password:
+            self.password_hash = self.hash_password(new_password)
+            logging.info("Contraseña cambiada exitosamente.")
+            messagebox.showinfo("Éxito", "Contraseña cambiada exitosamente.")
+
+            self.autenticado = False
+            self.autenticar(self.root)
+
+        else:
+            logging.warning("La nueva contraseña no coincide con la confirmación.")
+            messagebox.showerror("Error", "La nueva contraseña no coincide con la confirmación.")
+
+    def validate_password(self, contraseña):
+        if len(contraseña) < 6:
+            return False
+        if not re.match("^[a-zA-Z0-9._-]+$", contraseña):
+            return False
+        return True
+    
     def crear_tabla_registros(self):
         try:
             self.conexion_bd = sqlite3.connect("registros.db")
@@ -194,41 +230,6 @@ class Taximetro:
             logging.error("Error al introducir tarifas. Valores no numéricos.")
             messagebox.showerror("Error", "Introduce valores numéricos válidos.")
 
-    def cambiar_contraseña(self):
-        if not self.autenticado:
-            logging.warning("No se ha autenticado. Debes autenticarte para cambiar la contraseña.")
-            messagebox.showerror("Error", "No se ha autenticado. Debes autenticarte para cambiar la contraseña.")
-            return
-        
-        while True:
-
-            new_password = simpledialog.askstring("Cambiar contraseña", "Introduce la nueva contraseña:", show='*')
-            
-            if not self.validate_password(new_password):
-                messagebox.showerror("Error", "La nueva contraseña no cumple los requisitos. Debe tener al menos 6 caracteres y solo puede contener letras, números y los caracteres . - _")
-            else:
-                break
-            
-        confirm_password = simpledialog.askstring("Cambiar contraseña", "Confirma la nueva contraseña:", show='*')
-
-        if new_password == confirm_password:
-            self.password_hash = self.hash_password(new_password)
-            logging.info("Contraseña cambiada exitosamente.")
-            messagebox.showinfo("Éxito", "Contraseña cambiada exitosamente.")
-
-            self.autenticado = False
-            re.autenticar(self.root)
-
-        else:
-            logging.warning("La nueva contraseña no coincide con la confirmación.")
-            messagebox.showerror("Error", "La nueva contraseña no coincide con la confirmación.")
-
-    def validate_password(self, contraseña):
-        if len(contraseña) < 6:
-            return False
-        if not re.match("^[a-zA-Z0-9._-]+$", contraseña):
-            return False
-        return True
 
         
     def _cambiar_estado(self, tiempo_actual, en_movimiento):
@@ -290,7 +291,7 @@ class Taximetro:
 
     
 def parse_args():
-    parser = argparse.ArgumentParser(description='Taxímetro digital - Aplicación GUI')
+    parser = argparse.ArgumentParser(description='TaxiMide - Aplicación GUI')
     parser.add_argument('--password', type=str, default='1234', help='Contraseña para configurar tarifas (por defecto: "1234")')
     return parser.parse_args()
 
