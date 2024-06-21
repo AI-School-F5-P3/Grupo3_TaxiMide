@@ -238,7 +238,7 @@ class Taximetro:
             messagebox.showerror("Error", "Introduce valores numéricos válidos.")
 
 
-        
+ #"_cambiar_estado", para declarar que el método es privado       
     def _cambiar_estado(self, tiempo_actual, en_movimiento):
         tiempo_transcurrido = tiempo_actual - self.tiempo_ultimo_cambio
         if self.en_movimiento:
@@ -309,4 +309,3 @@ if __name__ == "__main__":
     taximetro.iniciar_carrera(root)
     root.mainloop()
 
-#Prueba
