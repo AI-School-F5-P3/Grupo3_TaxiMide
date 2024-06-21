@@ -1,17 +1,16 @@
-# En esta versión 8 el programa guarda en una base de datos (sqlite3) los registros de carreras pasadas
+import hashlib 
+import re       #importamos librerias
 import time
 import logging
 import argparse
 import tkinter as tk
 from tkinter import messagebox, simpledialog
 import sqlite3
-import hashlib #importamos libreria 
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', handlers=[
-    logging.FileHandler("taximetro.log"), 
+    logging.FileHandler("taximideapp.log"), 
     logging.StreamHandler()  
 ])
-# Configuramos el módulo "logging" para registrar eventos en un archivo ("taximetro.log") y en la consola. El formato del registro incluye la hora, el nivel de severidad y el mensaje.  
 
 class Taximetro:
     def __init__(self, contraseña):
@@ -29,16 +28,12 @@ class Taximetro:
         self.conexion_bd = None
         self.crear_tabla_registros()
         logging.info("Taxímetro iniciado con tarifas por defecto y contraseña establecida.")
-        # Inicializa variables de la instancia, incluidas las tarifas, el estado del taxímetro, la autenticación y la conexión a la base de datos. Llama al método "crear_tabla_registros" para configurar la base de datos y registra un mensaje de inicio.
-
-#programamos hashing de contraseñas
+        
+        #programamos hashing de contraseñas
     def hash_password(self, password):
         password_bytes = password.encode('utf-8')
-        
         hasher = hashlib.sha256()
-        
         hasher.update(password_bytes)
-        
         password_hash = hasher.hexdigest()
         
         return password_hash
@@ -51,49 +46,56 @@ class Taximetro:
         
         self.root = root
         self.root.title("TaxiMide")
-        self.root.geometry("450x600")
-        self.root.configure(bg="#242424")
+        self.root.geometry("600x500")
         ##242424 = black
-
-        self.estado_label = tk.Label(root, text="Taxi en parado.", font=("Helvetica", 20), fg="white", bg="#242424")
+        #aquí creamos la división de los box donde irán cada elemento dentro
+        self.frame_izquierda = tk.Frame(self.root, width=200,bg="deepskyblue2" )
+        self.frame_izquierda.pack(side=tk.LEFT, fill=tk.Y)
+        self.frame_derecha = tk.Frame(self.root, bg="grey24")
+        self.frame_derecha.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        self.frame_derecha_arriba = tk.Frame(self.frame_derecha, height=400, bg="light goldenrod")
+        self.frame_derecha_arriba.pack(side=tk.TOP, fill=tk.BOTH)
+        
+        self.estado_label = tk.Label(self.frame_derecha_arriba, text="Taxi en parado.", font=("Helvetica", 20), fg="dodgerblue", bg="light goldenrod")
         self.estado_label.pack(pady=10)
 
-        self.tarifa_parado_label = tk.Label(root, text=f"Tarifa en parado: {self.tarifa_parado:.2f} €/minuto", font=("Helvetica", 16), fg="white", bg="#242424")
-        self.tarifa_parado_label.pack()
+        self.tarifa_parado_label = tk.Label(self.frame_derecha, text=f"Tarifa en parado: {self.tarifa_parado:.2f} €/minuto", font=("Helvetica", 16), fg="dodgerblue", bg="grey24")
+        self.tarifa_parado_label.pack(pady=10)
 
-        self.tarifa_movimiento_label = tk.Label(root, text=f"Tarifa en movimiento: {self.tarifa_movimiento:.2f} €/minuto", font=("Helvetica", 16), fg="white", bg="#242424")
-        self.tarifa_movimiento_label.pack()
+        self.tarifa_movimiento_label = tk.Label(self.frame_derecha, text=f"Tarifa en movimiento: {self.tarifa_movimiento:.2f} €/minuto", font=("Helvetica", 16), fg="dodgerblue", bg="grey24")
+        self.tarifa_movimiento_label.pack(pady=10)
+        
+        self.total_label = tk.Label(self.frame_derecha, text="Total a cobrar: 0.00 euros", font=("Helvetica", 18), fg="dodgerblue", bg="grey24")
+        
         
          # Creamos un Canvas para los contadores visuales
-        self.canvas_tiempo = tk.Canvas(root, width=300, height=50, bg="grey", highlightthickness=5)
+        self.canvas_tiempo = tk.Canvas(self.frame_derecha, width=300, height=50, bg="grey", highlightthickness=5)
         self.canvas_tiempo.pack(pady=10)
 
-        self.canvas_euros = tk.Canvas(root, width=300, height=50, bg="grey", highlightthickness=5)
+        self.canvas_euros = tk.Canvas(self.frame_derecha, width=300, height=50, bg="grey", highlightthickness=5)
         self.canvas_euros.pack(pady=10)
+        
+        self.canva_fin = tk.Button(self.frame_derecha, text="Fin", activebackground="red", font=("helvetica", 14, "bold"), command=self.finalizar_carrera, width=18, fg="dodgerblue", bg="grey24")
+        self.canva_fin.pack(pady=5)
+        
+        self.logo_image = tk.PhotoImage(file="logo.png").subsample(3, 3)
+        self.logo_label = tk.Label(self.frame_izquierda,image=self.logo_image, bg="#3498db")
+        self.logo_label.pack(pady=5)
 
-        button_frame = tk.Frame(root, bg="black")
-        button_frame.pack(pady=10)
+        self.boton_marcha = tk.Button(self.frame_izquierda, text="Marcha", activebackground="blue", font=("Helvetica", 14, "bold"), command=self.iniciar_movimiento, width=18, bg="light goldenrod", fg="black")
+        self.boton_marcha.pack(pady=5)
+     
+        self.boton_parada = tk.Button(self.frame_izquierda, text="Parada", activebackground="blue", font=("Helvetica", 14, "bold"), command=self.detener_movimiento, width=18, bg="light goldenrod", fg="black")
+        self.boton_parada.pack(pady=5)
 
-        self.total_label = tk.Label(root, text="Total a cobrar: 0.00 euros", font=("Helvetica", 18), fg="white", bg="#242424")
-        self.total_label.pack(pady=10)
+        self.boton_configurar = tk.Button(self.frame_izquierda, text="Configurar tarifas", activebackground="blue", font=("Helvetica", 14, "bold"), command=self.configurar_tarifas, width=18, bg="light goldenrod", fg="black")
+        self.boton_configurar.pack(pady=5)
 
-        button_frame = tk.Frame(root, bg="#242424") ##007095 = blue
-        button_frame.pack(pady=10)
-
-        self.boton_marcha = tk.Button(button_frame, text="Marcha", font=("Helvetica", 14, "bold"), command=self.iniciar_movimiento, width=12, bg="#d1f5b4", fg="#007095")
-        self.boton_marcha.grid(row=0, column=0, padx=5, pady=5)
-        ##d1f5b4 = light green
-        self.boton_parada = tk.Button(button_frame, text="Parada", font=("Helvetica", 14, "bold"), command=self.detener_movimiento, width=12, bg="#d1f5b4", fg="#007095")
-        self.boton_parada.grid(row=0, column=1, padx=5)
-
-        self.boton_fin = tk.Button(button_frame, text="Fin", font=("Helvetica", 14, "bold"), command=self.finalizar_carrera, width=12, bg="#d1f5b4", fg="#007095")
-        self.boton_fin.grid(row=1, column=0, padx=5, pady=5)
-
-        self.boton_configurar = tk.Button(button_frame, text="Configurar tarifas", font=("Helvetica", 14, "bold"), command=self.configurar_tarifas, width=18, bg="#d1f5b4", fg="#007095")
-        self.boton_configurar.grid(row=1, column=1, padx=5, pady=5)
-
-        self.boton_cambiar_contraseña = tk.Button(button_frame, text="Cambiar contraseña", font=("Helvetica", 14, "bold"), command=self.cambiar_contraseña, width=18, bg="#d1f5b4", fg="#007095")
-        self.boton_cambiar_contraseña.grid(row=2, column=0, columnspan=2, pady=5)
+        self.boton_cambiar_contraseña = tk.Button(self.frame_izquierda, text="Cambiar contraseña", activebackground="blue", font=("Helvetica", 14, "bold"), command=self.cambiar_contraseña, width=18, bg="light goldenrod", fg="black")
+        self.boton_cambiar_contraseña.pack(pady=5)
+        
+        self.boton_quit = tk.Button(self.frame_izquierda, text="Exit", activebackground="blue", font=("helvetica", 14, "bold"), command=root.quit, width=18, bg="light goldenrod", fg="black")
+        self.boton_quit.pack(pady=5)
     
         self.actualizar_tiempo_costo()
 
@@ -123,6 +125,7 @@ class Taximetro:
         canvas.delete("all")  # Borramos todo lo dibujado previamente en el Canvas
         canvas.create_text(150, 30, text=texto, font=("Arial", 38), fill="white")
 
+
     def autenticar(self, root):
         intentos = 3
         while intentos > 0:
@@ -142,11 +145,47 @@ class Taximetro:
             logging.error("Número máximo de intentos alcanzado. Cierre del programa.")
             messagebox.showerror("Error", "Número máximo de intentos alcanzado. Cierre del programa.")
             root.destroy()
-
+    
     #aseguramos que la app reconoce contraseñas introducidas no hasheadas
     def verificar_password(self, entered_password):
         return entered_password == self.password_plaintext or self.hash_password(entered_password) == self.password_hash
 
+    def cambiar_contraseña(self):
+        if not self.autenticado:
+            logging.warning("No se ha autenticado. Debes autenticarte para cambiar la contraseña.")
+            messagebox.showerror("Error", "No se ha autenticado. Debes autenticarte para cambiar la contraseña.")
+            return
+        
+        while True:
+
+            new_password = simpledialog.askstring("Cambiar contraseña", "Introduce la nueva contraseña:", show='*')
+            
+            if not self.validate_password(new_password):
+                messagebox.showerror("Error", "La nueva contraseña no cumple los requisitos. Debe tener al menos 6 caracteres y solo puede contener letras, números y los caracteres . - _")
+            else:
+                break
+            
+        confirm_password = simpledialog.askstring("Cambiar contraseña", "Confirma la nueva contraseña:", show='*')
+
+        if new_password == confirm_password:
+            self.password_hash = self.hash_password(new_password)
+            logging.info("Contraseña cambiada exitosamente.")
+            messagebox.showinfo("Éxito", "Contraseña cambiada exitosamente.")
+
+            self.autenticado = False
+            self.autenticar(self.root)
+
+        else:
+            logging.warning("La nueva contraseña no coincide con la confirmación.")
+            messagebox.showerror("Error", "La nueva contraseña no coincide con la confirmación.")
+
+    def validate_password(self, contraseña):
+        if len(contraseña) < 6:
+            return False
+        if not re.match("^[a-zA-Z0-9._-]+$", contraseña):
+            return False
+        return True
+    
     def crear_tabla_registros(self):
         try:
             self.conexion_bd = sqlite3.connect("registros.db")
@@ -165,8 +204,7 @@ class Taximetro:
             logging.info("Tabla 'registros' creada correctamente.")
         except sqlite3.Error as e:
             logging.error(f"Error al crear la tabla 'registros': {e}")
-    # Definimos el método "crear_tabla_registros", que crea una tabla en la base de datos para almacenar los registros de las carreras.
-
+    
     def insertar_registro(self, tiempo_inicio, tiempo_fin, tiempo_parado, tiempo_movimiento, total_euros):
         try:
             cursor = self.conexion_bd.cursor()
@@ -178,7 +216,7 @@ class Taximetro:
             logging.info("Registro insertado correctamente en la tabla 'registros'.")
         except sqlite3.Error as e:
             logging.error(f"Error al insertar registro en la tabla 'registros': {e}")
-    # Definimos el método "insertar_registro", que inserta un registro en la tabla "registros" de la base de datos.
+
 
     def configurar_tarifas(self):
         if not self.autenticado:
@@ -199,22 +237,7 @@ class Taximetro:
             logging.error("Error al introducir tarifas. Valores no numéricos.")
             messagebox.showerror("Error", "Introduce valores numéricos válidos.")
 
-    def cambiar_contraseña(self):
-        if not self.autenticado:
-            logging.warning("No se ha autenticado. Debes autenticarte para cambiar la contraseña.")
-            messagebox.showerror("Error", "No se ha autenticado. Debes autenticarte para cambiar la contraseña.")
-            return
 
-        new_password = simpledialog.askstring("Cambiar contraseña", "Introduce la nueva contraseña:", show='*')
-        confirm_password = simpledialog.askstring("Cambiar contraseña", "Confirma la nueva contraseña:", show='*')
-
-        if new_password == confirm_password:
-            self.password_hash = self.hash_password(new_password)
-            logging.info("Contraseña cambiada exitosamente.")
-            messagebox.showinfo("Éxito", "Contraseña cambiada exitosamente.")
-        else:
-            logging.warning("La nueva contraseña no coincide con la confirmación.")
-            messagebox.showerror("Error", "La nueva contraseña no coincide con la confirmación.")
         
     def _cambiar_estado(self, tiempo_actual, en_movimiento):
         tiempo_transcurrido = tiempo_actual - self.tiempo_ultimo_cambio
@@ -228,16 +251,13 @@ class Taximetro:
         estado = "movimiento" if en_movimiento else "parado"
         self.estado_label.config(text=f"Taxi en {estado}.")
         logging.info(f"Taxi en {estado}.")
-    # Define el método "_cambiar_estado", que actualiza el estado del taxi (parado o en movimiento) y el tiempo transcurrido desde el último cambio de estado. 
-
+    
     def iniciar_movimiento(self):
         self._cambiar_estado(time.time(), True)
-    # Define el método "iniciar_movimiento", que actualiza el estado del taxi a "en movimiento" y actualiza el tiempo transcurrido desde el último cambio de estado.
-
+    
     def detener_movimiento(self):
         self._cambiar_estado(time.time(), False)
-    # Define el método "detener_movimiento", que actualiza el estado del taxi a "parado" y actualiza el tiempo transcurrido desde el último cambio de estado.
-    
+       
 
     def finalizar_carrera(self):
         tiempo_actual = time.time()
@@ -254,14 +274,12 @@ class Taximetro:
         )
         self.resetear_valores()
         self.preguntar_nueva_carrera()
-    # Define el método "finalizar_carrera", que calcula el total a cobrar, muestra el total al usuario, inserta el registro en la base de datos, resetea los valores y pregunta al usuario si desea iniciar una nueva carrera.
-
+    
     def preguntar_nueva_carrera(self):
         nueva_carrera = messagebox.askyesno("Nueva carrera", "¿Deseas iniciar una nueva carrera?")
         if not nueva_carrera:
             self.root.destroy()
-    # Define el método "preguntar_nueva_carrera", que muestra un mensaje para preguntar al usuario si desea iniciar una nueva carrera. Si el usuario responde "Sí", se inicia una nueva carrera. Si el usuario responde "No", se cierra la aplicación.
-
+    
     def resetear_valores(self):
         self.tiempo_total = 0
         self.total_euros = 0
@@ -269,19 +287,20 @@ class Taximetro:
         self.tiempo_ultimo_cambio = time.time()
         self.tiempo_parado = 0
         self.tiempo_movimiento = 0
-    # Define el método "resetear_valores", que resetea los valores de tiempo y total a sus valores iniciales.
-
+    
     def __del__(self):
-        if self.conexion_bd:
-            self.conexion_bd.close()
-            logging.info("Conexión a la base de datos cerrada correctamente.")
-    # Define el método "__del__", que cierra la conexión a la base de datos cuando se destruye la instancia del taxímetro.
+        try:
+            if self.conexion_bd:
+                self.conexion_bd.close()
+                logging.info("Conexión a la base de datos cerrada correctamente.")
+        except Exception as e:
+            logging.error(f"Error al cerrar la conexión a la base de datos: {e}")
 
+    
 def parse_args():
-    parser = argparse.ArgumentParser(description='Taxímetro digital - Aplicación GUI')
+    parser = argparse.ArgumentParser(description='TaxiMide - Aplicación GUI')
     parser.add_argument('--password', type=str, default='1234', help='Contraseña para configurar tarifas (por defecto: "1234")')
     return parser.parse_args()
-# Define la función "parse_args", que analiza los argumentos de la línea de comandos para obtener la contraseña. 
 
 if __name__ == "__main__":
     args = parse_args()
@@ -289,5 +308,5 @@ if __name__ == "__main__":
     root = tk.Tk()
     taximetro.iniciar_carrera(root)
     root.mainloop()
-# El bloque principal del programa se ejecuta si el script se ejecuta directamente. Analiza los argumentos de la línea de comandos, crea una instancia del "Taxímetro" con la contraseña proporcionada, inicia la interfaz gráfica y entra en el bucle principal de "tkinter".
+
 #Prueba
