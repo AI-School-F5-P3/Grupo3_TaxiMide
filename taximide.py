@@ -46,49 +46,56 @@ class Taximetro:
         
         self.root = root
         self.root.title("TaxiMide")
-        self.root.geometry("450x600")
-        self.root.configure(bg="#242424")
+        self.root.geometry("600x500")
         ##242424 = black
-
-        self.estado_label = tk.Label(root, text="Taxi en parado.", font=("Helvetica", 20), fg="white", bg="#242424")
+        #aquí creamos la división de los box donde irán cada elemento dentro
+        self.frame_izquierda = tk.Frame(self.root, width=200,bg="deepskyblue2" )
+        self.frame_izquierda.pack(side=tk.LEFT, fill=tk.Y)
+        self.frame_derecha = tk.Frame(self.root, bg="grey24")
+        self.frame_derecha.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        self.frame_derecha_arriba = tk.Frame(self.frame_derecha, height=400, bg="light goldenrod")
+        self.frame_derecha_arriba.pack(side=tk.TOP, fill=tk.BOTH)
+        
+        self.estado_label = tk.Label(self.frame_derecha_arriba, text="Taxi en parado.", font=("Helvetica", 20), fg="dodgerblue", bg="light goldenrod")
         self.estado_label.pack(pady=10)
 
-        self.tarifa_parado_label = tk.Label(root, text=f"Tarifa en parado: {self.tarifa_parado:.2f} €/minuto", font=("Helvetica", 16), fg="white", bg="#242424")
-        self.tarifa_parado_label.pack()
+        self.tarifa_parado_label = tk.Label(self.frame_derecha, text=f"Tarifa en parado: {self.tarifa_parado:.2f} €/minuto", font=("Helvetica", 16), fg="dodgerblue", bg="grey24")
+        self.tarifa_parado_label.pack(pady=10)
 
-        self.tarifa_movimiento_label = tk.Label(root, text=f"Tarifa en movimiento: {self.tarifa_movimiento:.2f} €/minuto", font=("Helvetica", 16), fg="white", bg="#242424")
-        self.tarifa_movimiento_label.pack()
+        self.tarifa_movimiento_label = tk.Label(self.frame_derecha, text=f"Tarifa en movimiento: {self.tarifa_movimiento:.2f} €/minuto", font=("Helvetica", 16), fg="dodgerblue", bg="grey24")
+        self.tarifa_movimiento_label.pack(pady=10)
+        
+        self.total_label = tk.Label(self.frame_derecha, text="Total a cobrar: 0.00 euros", font=("Helvetica", 18), fg="dodgerblue", bg="grey24")
+        
         
          # Creamos un Canvas para los contadores visuales
-        self.canvas_tiempo = tk.Canvas(root, width=300, height=50, bg="grey", highlightthickness=5)
+        self.canvas_tiempo = tk.Canvas(self.frame_derecha, width=300, height=50, bg="grey", highlightthickness=5)
         self.canvas_tiempo.pack(pady=10)
 
-        self.canvas_euros = tk.Canvas(root, width=300, height=50, bg="grey", highlightthickness=5)
+        self.canvas_euros = tk.Canvas(self.frame_derecha, width=300, height=50, bg="grey", highlightthickness=5)
         self.canvas_euros.pack(pady=10)
+        
+        self.canva_fin = tk.Button(self.frame_derecha, text="Fin", activebackground="red", font=("helvetica", 14, "bold"), command=self.finalizar_carrera, width=18, fg="dodgerblue", bg="grey24")
+        self.canva_fin.pack(pady=5)
+        
+        self.logo_image = tk.PhotoImage(file="logo.png").subsample(3, 3)
+        self.logo_label = tk.Label(self.frame_izquierda,image=self.logo_image, bg="#3498db")
+        self.logo_label.pack(pady=5)
 
-        button_frame = tk.Frame(root, bg="black")
-        button_frame.pack(pady=10)
+        self.boton_marcha = tk.Button(self.frame_izquierda, text="Marcha", activebackground="blue", font=("Helvetica", 14, "bold"), command=self.iniciar_movimiento, width=18, bg="light goldenrod", fg="black")
+        self.boton_marcha.pack(pady=5)
+     
+        self.boton_parada = tk.Button(self.frame_izquierda, text="Parada", activebackground="blue", font=("Helvetica", 14, "bold"), command=self.detener_movimiento, width=18, bg="light goldenrod", fg="black")
+        self.boton_parada.pack(pady=5)
 
-        self.total_label = tk.Label(root, text="Total a cobrar: 0.00 euros", font=("Helvetica", 18), fg="white", bg="#242424")
-        self.total_label.pack(pady=10)
+        self.boton_configurar = tk.Button(self.frame_izquierda, text="Configurar tarifas", activebackground="blue", font=("Helvetica", 14, "bold"), command=self.configurar_tarifas, width=18, bg="light goldenrod", fg="black")
+        self.boton_configurar.pack(pady=5)
 
-        button_frame = tk.Frame(root, bg="#242424") ##007095 = blue
-        button_frame.pack(pady=10)
-
-        self.boton_marcha = tk.Button(button_frame, text="Marcha", font=("Helvetica", 14, "bold"), command=self.iniciar_movimiento, width=12, bg="#d1f5b4", fg="#007095")
-        self.boton_marcha.grid(row=0, column=0, padx=5, pady=5)
-        ##d1f5b4 = light green
-        self.boton_parada = tk.Button(button_frame, text="Parada", font=("Helvetica", 14, "bold"), command=self.detener_movimiento, width=12, bg="#d1f5b4", fg="#007095")
-        self.boton_parada.grid(row=0, column=1, padx=5)
-
-        self.boton_fin = tk.Button(button_frame, text="Fin", font=("Helvetica", 14, "bold"), command=self.finalizar_carrera, width=12, bg="#d1f5b4", fg="#007095")
-        self.boton_fin.grid(row=1, column=0, padx=5, pady=5)
-
-        self.boton_configurar = tk.Button(button_frame, text="Configurar tarifas", font=("Helvetica", 14, "bold"), command=self.configurar_tarifas, width=18, bg="#d1f5b4", fg="#007095")
-        self.boton_configurar.grid(row=1, column=1, padx=5, pady=5)
-
-        self.boton_cambiar_contraseña = tk.Button(button_frame, text="Cambiar contraseña", font=("Helvetica", 14, "bold"), command=self.cambiar_contraseña, width=18, bg="#d1f5b4", fg="#007095")
-        self.boton_cambiar_contraseña.grid(row=2, column=0, columnspan=2, pady=5)
+        self.boton_cambiar_contraseña = tk.Button(self.frame_izquierda, text="Cambiar contraseña", activebackground="blue", font=("Helvetica", 14, "bold"), command=self.cambiar_contraseña, width=18, bg="light goldenrod", fg="black")
+        self.boton_cambiar_contraseña.pack(pady=5)
+        
+        self.boton_quit = tk.Button(self.frame_izquierda, text="Exit", activebackground="blue", font=("helvetica", 14, "bold"), command=root.quit, width=18, bg="light goldenrod", fg="black")
+        self.boton_quit.pack(pady=5)
     
         self.actualizar_tiempo_costo()
 
