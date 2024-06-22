@@ -83,19 +83,19 @@ class Taximetro:
         self.logo_label.pack(pady=5)
 
         self.boton_marcha = tk.Button(self.frame_izquierda, text="Marcha", activebackground="mediumblue", activeforeground="white", font=("Helvetica", 14, "bold"), command=self.iniciar_movimiento, width=18, bg="light goldenrod", fg="black")
-        self.boton_marcha.pack(pady=5)
+        self.boton_marcha.pack(pady=5, padx=5)
      
         self.boton_parada = tk.Button(self.frame_izquierda, text="Parada", activebackground="mediumblue", activeforeground="white", font=("Helvetica", 14, "bold"), command=self.detener_movimiento, width=18, bg="light goldenrod", fg="black")
-        self.boton_parada.pack(pady=5)
+        self.boton_parada.pack(pady=5, padx=5)
 
         self.boton_configurar = tk.Button(self.frame_izquierda, text="Configurar tarifas", activebackground="mediumblue", activeforeground="white", font=("Helvetica", 14, "bold"), command=self.configurar_tarifas, width=18, bg="light goldenrod", fg="black")
-        self.boton_configurar.pack(pady=5)
+        self.boton_configurar.pack(pady=5, padx=5)
 
         self.boton_cambiar_contraseña = tk.Button(self.frame_izquierda, text="Cambiar contraseña", activebackground="mediumblue", activeforeground="white", font=("Helvetica", 14, "bold"), command=self.cambiar_contraseña, width=18, bg="light goldenrod", fg="black")
-        self.boton_cambiar_contraseña.pack(pady=5)
+        self.boton_cambiar_contraseña.pack(pady=5, padx=5)
         
         self.boton_quit = tk.Button(self.frame_izquierda, text="Exit", activebackground="mediumblue", activeforeground="white", font=("helvetica", 14, "bold"), command=root.quit, width=18, bg="light goldenrod", fg="black")
-        self.boton_quit.pack(pady=5)
+        self.boton_quit.pack(pady=5, padx=5)
     
         self.actualizar_tiempo_costo()
 
