@@ -14,6 +14,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 
 class Taximetro:
     def __init__(self, contraseña):
+        self.db_path = 'taximetro.db'
         self.tarifa_parado = 0.02
         self.tarifa_movimiento = 0.05
         self.tiempo_total = 0
@@ -35,7 +36,7 @@ class Taximetro:
         hasher = hashlib.sha256()
         hasher.update(password_bytes)
         password_hash = hasher.hexdigest()
-        
+
         return password_hash
     
 
@@ -188,7 +189,7 @@ class Taximetro:
     
     def crear_tabla_registros(self):
         try:
-            with sqlite3.connect() as conn:
+            with sqlite3.connect(self.db_path) as conn: 
                 cursor = conn.cursor()
                 cursor.execute('''
                     CREATE TABLE IF NOT EXISTS registros (
@@ -204,9 +205,9 @@ class Taximetro:
         except sqlite3.Error as e:
             logging.error(f"Error al crear la tabla 'registros': {e}")
 
-    def insertar_registro(tiempo_inicio, tiempo_fin, tiempo_parado, tiempo_movimiento, total_euros):
+    def insertar_registros(self,tiempo_inicio, tiempo_fin, tiempo_parado, tiempo_movimiento, total_euros):
         try:
-            with sqlite3.connect() as conn:
+            with sqlite3.connect(self.db_path) as conn:
                 cursor = conn.cursor()
                 cursor.execute('''
                     INSERT INTO registros (tiempo_inicio, tiempo_fin, tiempo_parado, tiempo_movimiento, total_euros)
@@ -218,7 +219,7 @@ class Taximetro:
 
     def read_rows():
         try:
-            with sqlite3.connect() as conn:
+            with sqlite3.connect(self.db_path) as conn:
                 cursor = conn.cursor()
                 cursor.execute("SELECT * FROM registros")
                 datos = cursor.fetchall()
@@ -226,9 +227,6 @@ class Taximetro:
         except sqlite3.Error as e:
             logging.error(f"Error al leer registros de la tabla 'registros': {e}")
             return []
-
-   
-
 
     def configurar_tarifas(self):
         if not self.autenticado:
