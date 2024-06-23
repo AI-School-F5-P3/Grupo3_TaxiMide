@@ -186,34 +186,37 @@ class Taximetro:
             return False
         return True
     
+class DatabaseHandler:
+    def __init__(self, db_name="registros.db"):
+        self.db_name = db_name
+
     def crear_tabla_registros(self):
         try:
-            self.conexion_bd = sqlite3.connect("registros.db")
-            cursor = self.conexion_bd.cursor()
-            cursor.execute('''
-                CREATE TABLE IF NOT EXISTS registros (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    tiempo_inicio TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    tiempo_fin TIMESTAMP,
-                    tiempo_parado REAL,
-                    tiempo_movimiento REAL,
-                    total_euros REAL
-                )
-            ''')
-            self.conexion_bd.commit()
-            logging.info("Tabla 'registros' creada correctamente.")
+            with sqlite3.connect(self.db_name) as conn:
+                cursor = conn.cursor()
+                cursor.execute('''
+                    CREATE TABLE IF NOT EXISTS registros (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        tiempo_inicio TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        tiempo_fin TIMESTAMP,
+                        tiempo_parado REAL,
+                        tiempo_movimiento REAL,
+                        total_euros REAL
+                    )
+                ''')
+                logging.info("Tabla 'registros' creada correctamente.")
         except sqlite3.Error as e:
             logging.error(f"Error al crear la tabla 'registros': {e}")
-    
+
     def insertar_registro(self, tiempo_inicio, tiempo_fin, tiempo_parado, tiempo_movimiento, total_euros):
         try:
-            cursor = self.conexion_bd.cursor()
-            cursor.execute('''
-                INSERT INTO registros (tiempo_inicio, tiempo_fin, tiempo_parado, tiempo_movimiento, total_euros)
-                VALUES (?, ?, ?, ?, ?)
-            ''', (tiempo_inicio, tiempo_fin, tiempo_parado, tiempo_movimiento, total_euros))
-            self.conexion_bd.commit()
-            logging.info("Registro insertado correctamente en la tabla 'registros'.")
+            with sqlite3.connect(self.db_name) as conn:
+                cursor = conn.cursor()
+                cursor.execute('''
+                    INSERT INTO registros (tiempo_inicio, tiempo_fin, tiempo_parado, tiempo_movimiento, total_euros)
+                    VALUES (?, ?, ?, ?, ?)
+                ''', (tiempo_inicio, tiempo_fin, tiempo_parado, tiempo_movimiento, total_euros))
+                logging.info("Registro insertado correctamente en la tabla 'registros'.")
         except sqlite3.Error as e:
             logging.error(f"Error al insertar registro en la tabla 'registros': {e}")
 
