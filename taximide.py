@@ -186,13 +186,9 @@ class Taximetro:
             return False
         return True
     
-class DatabaseHandler:
-    def __init__(self, db_name="registros.db"):
-        self.db_name = db_name
-
     def crear_tabla_registros(self):
         try:
-            with sqlite3.connect(self.db_name) as conn:
+            with sqlite3.connect() as conn:
                 cursor = conn.cursor()
                 cursor.execute('''
                     CREATE TABLE IF NOT EXISTS registros (
@@ -208,9 +204,9 @@ class DatabaseHandler:
         except sqlite3.Error as e:
             logging.error(f"Error al crear la tabla 'registros': {e}")
 
-    def insertar_registro(self, tiempo_inicio, tiempo_fin, tiempo_parado, tiempo_movimiento, total_euros):
+    def insertar_registro(tiempo_inicio, tiempo_fin, tiempo_parado, tiempo_movimiento, total_euros):
         try:
-            with sqlite3.connect(self.db_name) as conn:
+            with sqlite3.connect() as conn:
                 cursor = conn.cursor()
                 cursor.execute('''
                     INSERT INTO registros (tiempo_inicio, tiempo_fin, tiempo_parado, tiempo_movimiento, total_euros)
@@ -219,6 +215,19 @@ class DatabaseHandler:
                 logging.info("Registro insertado correctamente en la tabla 'registros'.")
         except sqlite3.Error as e:
             logging.error(f"Error al insertar registro en la tabla 'registros': {e}")
+
+    def read_rows():
+        try:
+            with sqlite3.connect() as conn:
+                cursor = conn.cursor()
+                cursor.execute("SELECT * FROM registros")
+                datos = cursor.fetchall()
+                return datos
+        except sqlite3.Error as e:
+            logging.error(f"Error al leer registros de la tabla 'registros': {e}")
+            return []
+
+   
 
 
     def configurar_tarifas(self):
