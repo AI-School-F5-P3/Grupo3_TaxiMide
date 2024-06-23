@@ -14,7 +14,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 
 class Taximetro:
     def __init__(self, contraseña):
-        self.db_path = 'taximetro.db'
+        self.db_path = 'taximetro.db' # Al definir una ruta de base de datos aquí, se define en el resto del código, puede servir para la declaración de otras bases de datos
         self.tarifa_parado = 0.02
         self.tarifa_movimiento = 0.05
         self.tiempo_total = 0
@@ -189,7 +189,7 @@ class Taximetro:
     
     def crear_tabla_registros(self):
         try:
-            with sqlite3.connect(self.db_path) as conn: 
+            with sqlite3.connect(self.db_path) as conn: # desde la linea 17 trae la ruta de código de la base de datos en la declaraciónd de la clase, 
                 cursor = conn.cursor()
                 cursor.execute('''
                     CREATE TABLE IF NOT EXISTS registros (
@@ -205,24 +205,24 @@ class Taximetro:
         except sqlite3.Error as e:
             logging.error(f"Error al crear la tabla 'registros': {e}")
 
-    def insertar_registros(self,tiempo_inicio, tiempo_fin, tiempo_parado, tiempo_movimiento, total_euros):
+    def insertar_registros(self,tiempo_inicio, tiempo_fin, tiempo_parado, tiempo_movimiento, total_euros): # permite insertar varias filas a la vez
         try:
             with sqlite3.connect(self.db_path) as conn:
                 cursor = conn.cursor()
                 cursor.execute('''
-                    INSERT INTO registros (tiempo_inicio, tiempo_fin, tiempo_parado, tiempo_movimiento, total_euros)
+                    INSERT INTO registros (tiempo_inicio, tiempo_fin, tiempo_parado, tiempo_movimiento, total_euros) 
                     VALUES (?, ?, ?, ?, ?)
                 ''', (tiempo_inicio, tiempo_fin, tiempo_parado, tiempo_movimiento, total_euros))
                 logging.info("Registro insertado correctamente en la tabla 'registros'.")
         except sqlite3.Error as e:
             logging.error(f"Error al insertar registro en la tabla 'registros': {e}")
 
-    def read_rows():
+    def read_rows(): # permite leer, todos los registros para devolver la totalidad de los datos
         try:
             with sqlite3.connect(self.db_path) as conn:
                 cursor = conn.cursor()
-                cursor.execute("SELECT * FROM registros")
-                datos = cursor.fetchall()
+                cursor.execute("SELECT * FROM registros") # 
+                datos = cursor.fetchall() # este comando puede cambiarse para devolver solo eso
                 return datos
         except sqlite3.Error as e:
             logging.error(f"Error al leer registros de la tabla 'registros': {e}")
