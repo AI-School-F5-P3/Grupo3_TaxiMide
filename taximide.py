@@ -46,6 +46,25 @@ class CustomPasswordDialog(tk.Toplevel):
         self.result = None
         self.destroy()
 
+class CustomNotificationDialog(tk.Toplevel):
+    def __init__(self, parent, message, title, color):
+        super().__init__(parent)
+        self.parent = parent
+        self.title(title)
+        
+        self.body_frame = tk.Frame(self, bg=color)
+        self.body_frame.pack(padx=20, pady=20, fill=tk.BOTH, expand=True)
+
+        self.label = tk.Label(self.body_frame, text=message, font=("Helvetica", 14), bg=color, fg="black", wraplength=300)
+        self.label.pack(pady=(5, 20))
+
+        self.ok_button = tk.Button(self.body_frame, text="OK", command=self.destroy, font=("Helvetica", 12), bg="gray24", fg="gray90", activebackground="gray90", activeforeground="gray24", width=10)
+        self.ok_button.pack(pady=5)
+
+        self.protocol("WM_DELETE_WINDOW", self.destroy)
+        self.geometry("500x250")
+
+
 class Taximetro:
     def __init__(self, contraseña):
         self.tarifa_parado = 0.02
@@ -62,6 +81,15 @@ class Taximetro:
         self.conexion_bd = None
         self.crear_tabla_registros()
         logging.info("Taxímetro iniciado con tarifas por defecto y contraseña establecida.")
+
+    def show_custom_error(self, message):
+        CustomNotificationDialog(self.root, message, "Error", "red3")
+
+    def show_custom_warning(self, message):
+        CustomNotificationDialog(self.root, message, "Warning", "light goldenrod")
+
+    def show_custom_info(self, message):
+        CustomNotificationDialog(self.root, message, "Info", "dodgerblue")
         
         #programamos hashing de contraseñas
     def hash_password(self, password):
@@ -178,7 +206,7 @@ class Taximetro:
                     else:
                         intentos -= 1
                         if intentos > 0:
-                            messagebox.showerror("Error", f"Contraseña incorrecta. Te quedan {intentos} intentos.")
+                            self.show_custom_error(f"Contraseña incorrecta. Te quedan {intentos} intentos.")
                         logging.warning("Intento de acceso con contraseña incorrecta.")
                 else:
                     return
@@ -187,7 +215,7 @@ class Taximetro:
 
         if intentos == 0:
             logging.error("Número máximo de intentos alcanzado. Cierre del programa.")
-            messagebox.showerror("Error", "Número máximo de intentos alcanzado. Cierre del programa.")
+            self.show_custom_error("Número máximo de intentos alcanzado. Cierre del programa.")
             root.quit()
     
     #aseguramos que la app reconoce contraseñas introducidas no hasheadas
@@ -197,7 +225,7 @@ class Taximetro:
     def cambiar_contraseña(self):
         if not self.autenticado:
             logging.warning("No se ha autenticado. Debes autenticarte para cambiar la contraseña.")
-            messagebox.showerror("Error", "No se ha autenticado. Debes autenticarte para cambiar la contraseña.")
+            self.show_custom_error("No se ha autenticado. Debes autenticarte para cambiar la contraseña.")
             return
         
         # First dialog for new password
@@ -211,7 +239,7 @@ class Taximetro:
         new_password = dialog_new.result
             
         if not self.validate_password(new_password):
-            messagebox.showerror("Error", "La nueva contraseña no cumple los requisitos.  \nDebe tener al menos 6 caracteres y solo puede contener letras, números y los caracteres . - _")
+            self.show_custom_warning("La nueva contraseña no cumple los requisitos.  \nDebe tener al menos 6 caracteres y solo puede contener letras, números y los caracteres . - _")
             return
         
         dialog_confirm = CustomPasswordDialog(self.root, "Confirma la nueva contraseña:", "Confirmar Contraseña")
@@ -225,11 +253,11 @@ class Taximetro:
             self.password_hash = self.hash_password(new_password)
             self.password_plaintext = new_password
             logging.info("Contraseña cambiada exitosamente.")
-            messagebox.showinfo("Éxito", "Contraseña cambiada exitosamente.")
+            self.show_custom_info("Contraseña cambiada exitosamente.")
             self.autenticado = False
             self.autenticar(self.root)
         else:
-            messagebox.showerror("Error", "Las contraseñas no coinciden.")
+            self.show_custom_error("Error", "Las contraseñas no coinciden.")
             logging.warning("Las contraseñas no coinciden en el cambio de contraseña.")
 
     def validate_password(self, contraseña):
