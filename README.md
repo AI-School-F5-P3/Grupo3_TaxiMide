@@ -21,7 +21,7 @@ Este proyecto es una aplicación GUI para un taxímetro digital, desarrollada en
 ## Instalación
 1. Clonar el repositorio:
 Copiar código
-git clone https://github.com/tu_usuario/taximetro.git
+git clone git@github.com:AI-School-F5-P3/Grupo3_TaxiMide.git
 
 2. Instalar las dependencias:
 pip install customtkinter
