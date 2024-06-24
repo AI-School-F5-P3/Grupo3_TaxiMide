@@ -7,6 +7,7 @@ import tkinter as tk
 import customtkinter
 from tkinter import messagebox, simpledialog
 import sqlite3
+import os
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', handlers=[
     logging.FileHandler("taximideapp.log"), 
@@ -164,7 +165,9 @@ class Taximetro:
         self.canva_fin = customtkinter.CTkButton(self.frame_derecha, text="Fin", font=("helvetica", 24, "bold"), command=self.finalizar_carrera, width=150, height=50, hover_color="tomato", text_color="blue4", fg_color="grey60", state=tk.DISABLED)
         self.canva_fin.pack(pady=5)
         
-        self.logo_image = tk.PhotoImage(file="logo.png").subsample(3, 3)
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        self.logo_image = tk.PhotoImage(file=os.path.join(current_dir, "logo.png")).subsample(3, 3)
+
         self.logo_label = tk.Label(self.frame_izquierda,image=self.logo_image, bg="#3498db")
         self.logo_label.pack(pady=5)
 
