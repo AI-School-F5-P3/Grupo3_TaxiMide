@@ -75,6 +75,7 @@ class Taximetro:
         self.tarifa_movimiento = 0.05
         self.tiempo_total = 0
         self.total_euros = 0
+        self.carrera_iniciada = False
         self.en_movimiento = False
         self.tiempo_ultimo_cambio = time.time()
         self.tiempo_parado = 0
@@ -103,6 +104,19 @@ class Taximetro:
         password_hash = hasher.hexdigest()
         
         return password_hash
+    
+    def empezar_carrera(self):
+        if not self.carrera_iniciada:
+            self.carrera_iniciada = True
+            self.resetear_valores()
+            self.tiempo_ultimo_cambio = time.time()
+            self.actualizar_tiempo_costo()
+            self.estado_label.config(text="Taxi en parado.")
+            self.boton_empezar_carrera.config(state=tk.DISABLED)
+            self.boton_marcha.config(state=tk.NORMAL)
+            self.boton_parada.config(state=tk.NORMAL)
+            self.canva_fin.config(state=tk.NORMAL)
+            logging.info("Carrera iniciada.")
     
 
     def iniciar_carrera(self, root):
@@ -144,17 +158,20 @@ class Taximetro:
         self.canvas_euros = tk.Canvas(self.frame_derecha, width=300, height=50, bg="grey", highlightthickness=5)
         self.canvas_euros.pack(pady=10)
         
-        self.canva_fin = tk.Button(self.frame_derecha, text="Fin", activebackground="red3", activeforeground="white", font=("helvetica", 14, "bold"), command=self.finalizar_carrera, width=18, fg="dodgerblue", bg="grey24")
+        self.canva_fin = tk.Button(self.frame_derecha, text="Fin", activebackground="red3", activeforeground="white", font=("helvetica", 14, "bold"), command=self.finalizar_carrera, width=18, fg="dodgerblue", bg="grey24", state=tk.DISABLED)
         self.canva_fin.pack(pady=5)
         
         self.logo_image = tk.PhotoImage(file="logo.png").subsample(3, 3)
         self.logo_label = tk.Label(self.frame_izquierda,image=self.logo_image, bg="#3498db")
         self.logo_label.pack(pady=5)
 
-        self.boton_marcha = tk.Button(self.frame_izquierda, text="Marcha", activebackground="mediumblue", activeforeground="white", font=("Helvetica", 14, "bold"), command=self.iniciar_movimiento, width=18, bg="light goldenrod", fg="black")
+        self.boton_empezar_carrera = tk.Button(self.frame_izquierda, text="Empezar Carrera", activebackground="mediumblue", activeforeground="white", font=("Helvetica", 14, "bold"), command=self.empezar_carrera, width=18, bg="light goldenrod", fg="black")
+        self.boton_empezar_carrera.pack(pady=5, padx=5)
+
+        self.boton_marcha = tk.Button(self.frame_izquierda, text="Marcha", activebackground="mediumblue", activeforeground="white", font=("Helvetica", 14, "bold"), command=self.iniciar_movimiento, width=18, bg="light goldenrod", fg="black", state=tk.DISABLED)
         self.boton_marcha.pack(pady=5, padx=5)
      
-        self.boton_parada = tk.Button(self.frame_izquierda, text="Parada", activebackground="mediumblue", activeforeground="white", font=("Helvetica", 14, "bold"), command=self.detener_movimiento, width=18, bg="light goldenrod", fg="black")
+        self.boton_parada = tk.Button(self.frame_izquierda, text="Parada", activebackground="mediumblue", activeforeground="white", font=("Helvetica", 14, "bold"), command=self.detener_movimiento, width=18, bg="light goldenrod", fg="black", state=tk.DISABLED)
         self.boton_parada.pack(pady=5, padx=5)
 
         self.boton_configurar = tk.Button(self.frame_izquierda, text="Configurar tarifas", activebackground="mediumblue", activeforeground="white", font=("Helvetica", 14, "bold"), command=self.configurar_tarifas, width=18, bg="light goldenrod", fg="black")
