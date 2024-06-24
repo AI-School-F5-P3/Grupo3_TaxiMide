@@ -34,9 +34,11 @@ class CustomPasswordDialog(tk.Toplevel):
 
         self.cancel_button = customtkinter.CTkButton(self.body_frame, text="Cancel", command=self.cancel, font=("Helvetica", 20), hover_color="pale green", text_color="black",  fg_color="light goldenrod", width=100, height=30)
         self.cancel_button.pack(side=tk.RIGHT, padx=50)
-        # customtkinter.CTkButton(self.frame_izquierda, text="Empezar Carrera", hover_color="pale green", text_color="black", font=("Helvetica", 20, "bold"), command=self.empezar_carrera, width=150, height=30, fg_color="light goldenrod")
+        
         self.protocol("WM_DELETE_WINDOW", self.cancel)
+        self.grab_set()
         self.geometry("500x200")
+        self.attributes('-topmost', True)
         self.result = None
 
         self.bind("<Return>", lambda event: self.ok())
@@ -67,14 +69,15 @@ class CustomNotificationDialog(tk.Toplevel):
         
 
         self.protocol("WM_DELETE_WINDOW", self.destroy)
+        self.grab_set()
         self.geometry("500x250")
+        self.attributes('-topmost', True)
 
         self.bind("<Return>", lambda event: self.destroy())
 
 
 class Taximetro:
     def __init__(self, contraseña):
-        self.db_path = 'taximetro.db' # Al definir una ruta de base de datos aquí, se define en el resto del código, puede servir para la declaración de otras bases de datos
         self.tarifa_parado = 0.02
         self.tarifa_movimiento = 0.05
         self.tiempo_total = 0
@@ -196,6 +199,8 @@ class Taximetro:
         self.actualizar_canvas(self.canvas_tiempo, "00:00:00")
         self.actualizar_canvas(self.canvas_euros, "0.00 €")
 
+        self.root.deiconify()
+
     def actualizar_tiempo_costo(self):
         tiempo_actual = time.time()
         tiempo_transcurrido = tiempo_actual - self.tiempo_ultimo_cambio
@@ -227,7 +232,9 @@ class Taximetro:
         intentos = 3
         while intentos > 0:
             if not self.autenticado:
+                root.deiconify()  # Show the root window
                 dialog = CustomPasswordDialog(root, "Ingresa la contraseña para continuar:")
+                root.withdraw()  # Hide the root window again
                 root.wait_window(dialog)
                 
                 if dialog.result is not None:
@@ -247,6 +254,7 @@ class Taximetro:
 
         if intentos == 0:
             logging.error("Número máximo de intentos alcanzado. Cierre del programa.")
+            root.deiconify()
             self.show_custom_error("Número máximo de intentos alcanzado. Cierre del programa.")
             root.quit()
     
@@ -298,48 +306,37 @@ class Taximetro:
         if not re.match("^[a-zA-Z0-9._-]+$", contraseña):
             return False
         return True
-
     
     def crear_tabla_registros(self):
         try:
-            with sqlite3.connect(self.db_path) as conn: # desde la linea 17 trae la ruta de código de la base de datos en la declaraciónd de la clase, 
-                cursor = conn.cursor()
-                cursor.execute('''
-                    CREATE TABLE IF NOT EXISTS registros (
-                        id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        tiempo_inicio TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                        tiempo_fin TIMESTAMP,
-                        tiempo_parado REAL,
-                        tiempo_movimiento REAL,
-                        total_euros REAL
-                    )
-                ''')
-                logging.info("Tabla 'registros' creada correctamente.")
+            self.conexion_bd = sqlite3.connect("registros.db")
+            cursor = self.conexion_bd.cursor()
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS registros (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    tiempo_inicio TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    tiempo_fin TIMESTAMP,
+                    tiempo_parado REAL,
+                    tiempo_movimiento REAL,
+                    total_euros REAL
+                )
+            ''')
+            self.conexion_bd.commit()
+            logging.info("Tabla 'registros' creada correctamente.")
         except sqlite3.Error as e:
             logging.error(f"Error al crear la tabla 'registros': {e}")
-
-    def insertar_registros(self,tiempo_inicio, tiempo_fin, tiempo_parado, tiempo_movimiento, total_euros): # permite insertar varias filas a la vez
+    
+    def insertar_registro(self, tiempo_inicio, tiempo_fin, tiempo_parado, tiempo_movimiento, total_euros):
         try:
-            with sqlite3.connect(self.db_path) as conn:
-                cursor = conn.cursor()
-                cursor.execute('''
-                    INSERT INTO registros (tiempo_inicio, tiempo_fin, tiempo_parado, tiempo_movimiento, total_euros) 
-                    VALUES (?, ?, ?, ?, ?)
-                ''', (tiempo_inicio, tiempo_fin, tiempo_parado, tiempo_movimiento, total_euros))
-                logging.info("Registro insertado correctamente en la tabla 'registros'.")
+            cursor = self.conexion_bd.cursor()
+            cursor.execute('''
+                INSERT INTO registros (tiempo_inicio, tiempo_fin, tiempo_parado, tiempo_movimiento, total_euros)
+                VALUES (?, ?, ?, ?, ?)
+            ''', (tiempo_inicio, tiempo_fin, tiempo_parado, tiempo_movimiento, total_euros))
+            self.conexion_bd.commit()
+            logging.info("Registro insertado correctamente en la tabla 'registros'.")
         except sqlite3.Error as e:
             logging.error(f"Error al insertar registro en la tabla 'registros': {e}")
-
-    def read_rows(): # permite leer, todos los registros para devolver la totalidad de los datos
-        try:
-            with sqlite3.connect(self.db_path) as conn:
-                cursor = conn.cursor()
-                cursor.execute("SELECT * FROM registros") # 
-                datos = cursor.fetchall() # este comando puede cambiarse para devolver solo eso
-                return datos
-        except sqlite3.Error as e:
-            logging.error(f"Error al leer registros de la tabla 'registros': {e}")
-            return []
 
 
     def configurar_tarifas(self):
@@ -397,7 +394,7 @@ class Taximetro:
         self.total_euros = (self.tiempo_movimiento * self.tarifa_movimiento) + (self.tiempo_parado * self.tarifa_parado)
         self.total_label.config(text=f"Total a cobrar: {self.total_euros:.2f} euros")
         messagebox.showinfo("Carrera finalizada", f"Total a cobrar: {self.total_euros:.2f} euros")
-        self.insertar_registros(
+        self.insertar_registro(
             tiempo_inicio=self.tiempo_ultimo_cambio - (self.tiempo_parado + self.tiempo_movimiento),
             tiempo_fin=self.tiempo_ultimo_cambio,
             tiempo_parado=self.tiempo_parado,
