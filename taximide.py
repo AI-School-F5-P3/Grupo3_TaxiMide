@@ -4,6 +4,7 @@ import time
 import logging
 import argparse
 import tkinter as tk
+import customtkinter
 from tkinter import messagebox, simpledialog
 import sqlite3
 
@@ -144,27 +145,27 @@ class Taximetro:
         self.canvas_euros = tk.Canvas(self.frame_derecha, width=300, height=50, bg="grey", highlightthickness=5)
         self.canvas_euros.pack(pady=10)
         
-        self.canva_fin = tk.Button(self.frame_derecha, text="Fin", activebackground="red3", activeforeground="white", font=("helvetica", 14, "bold"), command=self.finalizar_carrera, width=18, fg="dodgerblue", bg="grey24")
+        self.canva_fin = customtkinter.CTkButton(self.frame_derecha, text="Fin", font=("helvetica", 24, "bold"), command=self.finalizar_carrera, width=150, height=50, hover_color="tomato", text_color="blue4", fg_color="grey60")
         self.canva_fin.pack(pady=5)
         
         self.logo_image = tk.PhotoImage(file="logo.png").subsample(3, 3)
         self.logo_label = tk.Label(self.frame_izquierda,image=self.logo_image, bg="#3498db")
         self.logo_label.pack(pady=5)
 
-        self.boton_marcha = tk.Button(self.frame_izquierda, text="Marcha", activebackground="mediumblue", activeforeground="white", font=("Helvetica", 14, "bold"), command=self.iniciar_movimiento, width=18, bg="light goldenrod", fg="black")
-        self.boton_marcha.pack(pady=5, padx=5)
+        self.boton_marcha = customtkinter.CTkButton(self.frame_izquierda, text="Marcha", hover_color="pale green", text_color="black", font=("Helvetica", 20, "bold"), command=self.iniciar_movimiento, width=150, height=30, fg_color="light goldenrod")
+        self.boton_marcha.pack(pady=5)
      
-        self.boton_parada = tk.Button(self.frame_izquierda, text="Parada", activebackground="mediumblue", activeforeground="white", font=("Helvetica", 14, "bold"), command=self.detener_movimiento, width=18, bg="light goldenrod", fg="black")
-        self.boton_parada.pack(pady=5, padx=5)
+        self.boton_parada = customtkinter.CTkButton(self.frame_izquierda, text="Parada", font=("Helvetica", 20, "bold"), command=self.detener_movimiento, width=150, height=30, hover_color="tomato", text_color="black", fg_color="light goldenrod")
+        self.boton_parada.pack(pady=5)
 
-        self.boton_configurar = tk.Button(self.frame_izquierda, text="Configurar tarifas", activebackground="mediumblue", activeforeground="white", font=("Helvetica", 14, "bold"), command=self.configurar_tarifas, width=18, bg="light goldenrod", fg="black")
-        self.boton_configurar.pack(pady=5, padx=5)
+        self.boton_configurar = customtkinter.CTkButton(self.frame_izquierda, text="Tarifas", font=("Helvetica", 20, "bold"), command=self.configurar_tarifas, width=150, height=30, hover_color="cyan", text_color="black", fg_color="light goldenrod")
+        self.boton_configurar.pack(pady=5)
 
-        self.boton_cambiar_contraseña = tk.Button(self.frame_izquierda, text="Cambiar contraseña", activebackground="mediumblue", activeforeground="white", font=("Helvetica", 14, "bold"), command=self.cambiar_contraseña, width=18, bg="light goldenrod", fg="black")
-        self.boton_cambiar_contraseña.pack(pady=5, padx=5)
+        self.boton_cambiar_contraseña = customtkinter.CTkButton(self.frame_izquierda, text="Contraseña", font=("Helvetica", 20, "bold"), command=self.cambiar_contraseña, width=150, height=30, hover_color="cyan", text_color="black", fg_color="light goldenrod")
+        self.boton_cambiar_contraseña.pack(pady=5)
         
-        self.boton_quit = tk.Button(self.frame_izquierda, text="Exit", activebackground="mediumblue", activeforeground="white", font=("helvetica", 14, "bold"), command=root.quit, width=18, bg="light goldenrod", fg="black")
-        self.boton_quit.pack(pady=5, padx=5)
+        self.boton_quit = customtkinter.CTkButton(self.frame_izquierda, text="Exit", font=("Helvetica", 20, "bold"), command=self.root.quit, width=150, height=30, hover_color="cyan", text_color="black", fg_color="light goldenrod")
+        self.boton_quit.pack(pady=5)
     
         self.actualizar_tiempo_costo()
 
