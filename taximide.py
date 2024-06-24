@@ -78,6 +78,7 @@ class CustomNotificationDialog(tk.Toplevel):
 
 class Taximetro:
     def __init__(self, contraseña):
+        self.db_path = 'taximetro.db'
         self.tarifa_parado = 0.02
         self.tarifa_movimiento = 0.05
         self.tiempo_total = 0
