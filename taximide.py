@@ -113,11 +113,11 @@ class Taximetro:
             self.tiempo_ultimo_cambio = time.time()
             self.en_movimiento = False  # Ensure we start in "parado" state
             self.actualizar_tiempo_costo()
-            self.estado_label.config(text="Taxi en parado.")
-            self.boton_empezar_carrera.config(state=tk.DISABLED)
-            self.boton_marcha.config(state=tk.NORMAL)
-            self.boton_parada.config(state=tk.DISABLED)  # Disable "Parada" button initially
-            self.canva_fin.config(state=tk.NORMAL)
+            self.estado_label.configure(text="Taxi en parado.")
+            self.boton_empezar_carrera.configure(state=tk.DISABLED)
+            self.boton_marcha.configure(state=tk.NORMAL)
+            self.boton_parada.configure(state=tk.DISABLED)  # Disable "Parada" button initially
+            self.canva_fin.configure(state=tk.NORMAL)
             logging.info("Carrera iniciada. Taxi en parado.")
             self.actualizar_tiempo_costo()
         
@@ -161,17 +161,20 @@ class Taximetro:
         self.canvas_euros = tk.Canvas(self.frame_derecha, width=300, height=50, bg="grey", highlightthickness=5)
         self.canvas_euros.pack(pady=10)
         
-        self.canva_fin = customtkinter.CTkButton(self.frame_derecha, text="Fin", font=("helvetica", 24, "bold"), command=self.finalizar_carrera, width=150, height=50, hover_color="tomato", text_color="blue4", fg_color="grey60")
+        self.canva_fin = customtkinter.CTkButton(self.frame_derecha, text="Fin", font=("helvetica", 24, "bold"), command=self.finalizar_carrera, width=150, height=50, hover_color="tomato", text_color="blue4", fg_color="grey60", state=tk.DISABLED)
         self.canva_fin.pack(pady=5)
         
         self.logo_image = tk.PhotoImage(file="logo.png").subsample(3, 3)
         self.logo_label = tk.Label(self.frame_izquierda,image=self.logo_image, bg="#3498db")
         self.logo_label.pack(pady=5)
 
-        self.boton_marcha = customtkinter.CTkButton(self.frame_izquierda, text="Marcha", hover_color="pale green", text_color="black", font=("Helvetica", 20, "bold"), command=self.iniciar_movimiento, width=150, height=30, fg_color="light goldenrod")
+        self.boton_empezar_carrera = customtkinter.CTkButton(self.frame_izquierda, text="Empezar Carrera", hover_color="pale green", text_color="black", font=("Helvetica", 20, "bold"), command=self.empezar_carrera, width=150, height=30, fg_color="light goldenrod")
+        self.boton_empezar_carrera.pack(pady=5)
+
+        self.boton_marcha = customtkinter.CTkButton(self.frame_izquierda, text="Marcha", hover_color="pale green", text_color="black", font=("Helvetica", 20, "bold"), command=self.iniciar_movimiento, width=150, height=30, fg_color="light goldenrod", state=tk.DISABLED)
         self.boton_marcha.pack(pady=5)
      
-        self.boton_parada = customtkinter.CTkButton(self.frame_izquierda, text="Parada", font=("Helvetica", 20, "bold"), command=self.detener_movimiento, width=150, height=30, hover_color="tomato", text_color="black", fg_color="light goldenrod")
+        self.boton_parada = customtkinter.CTkButton(self.frame_izquierda, text="Parada", font=("Helvetica", 20, "bold"), command=self.detener_movimiento, width=150, height=30, hover_color="tomato", text_color="black", fg_color="light goldenrod", state=tk.DISABLED)
         self.boton_parada.pack(pady=5)
         
         self.boton_configurar = customtkinter.CTkButton(self.frame_izquierda, text="Tarifas", font=("Helvetica", 20, "bold"), command=self.configurar_tarifas, width=150, height=30, hover_color="cyan", text_color="black", fg_color="light goldenrod")
@@ -338,8 +341,8 @@ class Taximetro:
             self.tarifa_parado = nueva_tarifa_parado
             self.tarifa_movimiento = nueva_tarifa_movimiento
             logging.info("Tarifas actualizadas en parado: %.2f, y en movimiento: %.2f", self.tarifa_parado, self.tarifa_movimiento)
-            self.tarifa_parado_label.config(text=f"Tarifa en parado: {self.tarifa_parado:.2f} €/minuto")
-            self.tarifa_movimiento_label.config(text=f"Tarifa en movimiento: {self.tarifa_movimiento:.2f} €/minuto")
+            self.tarifa_parado_label.configure(text=f"Tarifa en parado: {self.tarifa_parado:.2f} €/minuto")
+            self.tarifa_movimiento_label.configure(text=f"Tarifa en movimiento: {self.tarifa_movimiento:.2f} €/minuto")
             messagebox.showinfo("Éxito", "Tarifas actualizadas.")
         except ValueError:
             logging.error("Error al introducir tarifas. Valores no numéricos.")
@@ -357,14 +360,14 @@ class Taximetro:
         self.en_movimiento = en_movimiento
         self.tiempo_ultimo_cambio = tiempo_actual
         estado = "movimiento" if en_movimiento else "parado"
-        self.estado_label.config(text=f"Taxi en {estado}.")
+        self.estado_label.configure(text=f"Taxi en {estado}.")
     
         if en_movimiento:
-            self.boton_marcha.config(state=tk.DISABLED)
-            self.boton_parada.config(state=tk.NORMAL)
+            self.boton_marcha.configure(state=tk.DISABLED)
+            self.boton_parada.configure(state=tk.NORMAL)
         else:
-            self.boton_marcha.config(state=tk.NORMAL)
-            self.boton_parada.config(state=tk.DISABLED)
+            self.boton_marcha.configure(state=tk.NORMAL)
+            self.boton_parada.configure(state=tk.DISABLED)
     
         logging.info(f"Taxi en {estado}.")
     
