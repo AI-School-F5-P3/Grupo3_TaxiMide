@@ -4,6 +4,7 @@ import time
 import logging
 import argparse
 import tkinter as tk
+import customtkinter
 from tkinter import messagebox, simpledialog
 import sqlite3
 
@@ -12,13 +13,76 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
     logging.StreamHandler()  
 ])
 
+class CustomPasswordDialog(tk.Toplevel):
+    def __init__(self, parent, message, title="Autenticación"):
+        super().__init__(parent)
+        self.parent = parent
+        self.title(title)
+        
+        self.body_frame = tk.Frame(self, bg="dodgerblue")
+        self.body_frame.pack(padx=20, pady=20, fill=tk.BOTH, expand=True)
+
+        self.label = tk.Label(self.body_frame, text=message, font=("Helvetica", 16), bg="dodgerblue", fg="black")
+        self.label.pack(pady=(0, 10))
+
+        self.entry = tk.Entry(self.body_frame, show="*", font=("Helvetica", 12), bg="lightgrey", fg="black")
+        self.entry.pack(pady=(10, 10))
+        self.entry.focus_set()
+
+        self.ok_button = customtkinter.CTkButton(self.body_frame, text="OK", command=self.ok, font=("Helvetica", 20), hover_color="pale green", text_color="black",  fg_color="light goldenrod", width=100, height=30)
+        self.ok_button.pack(side=tk.LEFT, padx=50)
+
+        self.cancel_button = customtkinter.CTkButton(self.body_frame, text="Cancel", command=self.cancel, font=("Helvetica", 20), hover_color="pale green", text_color="black",  fg_color="light goldenrod", width=100, height=30)
+        self.cancel_button.pack(side=tk.RIGHT, padx=50)
+        
+        self.protocol("WM_DELETE_WINDOW", self.cancel)
+        self.grab_set()
+        self.geometry("500x200")
+        self.attributes('-topmost', True)
+        self.result = None
+
+        self.bind("<Return>", lambda event: self.ok())
+        self.bind("<Escape>", lambda event: self.cancel())
+        
+    def ok(self):
+        self.result = self.entry.get()
+        self.destroy()
+    
+    def cancel(self):
+        self.result = None
+        self.parent.destroy()
+
+class CustomNotificationDialog(tk.Toplevel):
+    def __init__(self, parent, message, title, color):
+        super().__init__(parent)
+        self.parent = parent
+        self.title(title)
+        
+        self.body_frame = tk.Frame(self, bg=color)
+        self.body_frame.pack(padx=20, pady=20, fill=tk.BOTH, expand=True)
+
+        self.label = tk.Label(self.body_frame, text=message, font=("Helvetica", 14), bg=color, fg="black", wraplength=300)
+        self.label.pack(pady=(5, 20))
+
+        self.ok_button = customtkinter.CTkButton(self.body_frame, text="OK", command=self.destroy, font=("Helvetica", 20), hover_color="pale green", text_color="black",  fg_color="light goldenrod", width=100, height=30)
+        self.ok_button.pack(pady=5)
+        
+
+        self.protocol("WM_DELETE_WINDOW", self.destroy)
+        self.grab_set()
+        self.geometry("500x250")
+        self.attributes('-topmost', True)
+
+        self.bind("<Return>", lambda event: self.destroy())
+
+
 class Taximetro:
     def __init__(self, contraseña):
-        self.db_path = 'taximetro.db' # Al definir una ruta de base de datos aquí, se define en el resto del código, puede servir para la declaración de otras bases de datos
         self.tarifa_parado = 0.02
         self.tarifa_movimiento = 0.05
         self.tiempo_total = 0
         self.total_euros = 0
+        self.carrera_iniciada = False
         self.en_movimiento = False
         self.tiempo_ultimo_cambio = time.time()
         self.tiempo_parado = 0
@@ -29,6 +93,15 @@ class Taximetro:
         self.conexion_bd = None
         self.crear_tabla_registros()
         logging.info("Taxímetro iniciado con tarifas por defecto y contraseña establecida.")
+
+    def show_custom_error(self, message):
+        CustomNotificationDialog(self.root, message, "Error", "tomato")
+
+    def show_custom_warning(self, message):
+        CustomNotificationDialog(self.root, message, "Warning", "dark goldenrod")
+
+    def show_custom_info(self, message):
+        CustomNotificationDialog(self.root, message, "Info", "cyan")
         
         #programamos hashing de contraseñas
     def hash_password(self, password):
@@ -36,16 +109,33 @@ class Taximetro:
         hasher = hashlib.sha256()
         hasher.update(password_bytes)
         password_hash = hasher.hexdigest()
-
+        
         return password_hash
     
+    def empezar_carrera(self):
+        if not self.carrera_iniciada:
+            self.carrera_iniciada = False
+            self.resetear_valores()
+            self.tiempo_ultimo_cambio = time.time()
+            self.en_movimiento = False  # Ensure we start in "parado" state
+            self.estado_label.configure(text="Taxi en parado.")
+            self.boton_empezar_carrera.configure(state=tk.DISABLED)
+            self.boton_marcha.configure(state=tk.NORMAL)
+            self.boton_parada.configure(state=tk.DISABLED)  # Disable "Parada" button initially
+            self.canva_fin.configure(state=tk.NORMAL)
+            logging.info("Carrera iniciada. Taxi en parado.")
+            self.actualizar_tiempo_costo()
+        
 
     def iniciar_carrera(self, root):
+        self.root = root
+        self.root.withdraw()  # Hide the main window initially
         self.autenticar(root)
         if not self.autenticado:
+            root.quit()
             return
         
-        self.root = root
+        self.root.deiconify()
         self.root.title("TaxiMide")
         self.root.geometry("600x500")
         
@@ -76,29 +166,40 @@ class Taximetro:
         self.canvas_euros = tk.Canvas(self.frame_derecha, width=300, height=50, bg="grey", highlightthickness=5)
         self.canvas_euros.pack(pady=10)
         
-        self.canva_fin = tk.Button(self.frame_derecha, text="Fin", activebackground="red3", activeforeground="white", font=("helvetica", 14, "bold"), command=self.finalizar_carrera, width=18, fg="dodgerblue", bg="grey24")
+        self.canva_fin = customtkinter.CTkButton(self.frame_derecha, text="Fin", font=("helvetica", 24, "bold"), command=self.finalizar_carrera, width=150, height=50, hover_color="tomato", text_color="blue4", fg_color="grey60", state=tk.DISABLED)
         self.canva_fin.pack(pady=5)
         
         self.logo_image = tk.PhotoImage(file="logo.png").subsample(3, 3)
         self.logo_label = tk.Label(self.frame_izquierda,image=self.logo_image, bg="#3498db")
         self.logo_label.pack(pady=5)
 
-        self.boton_marcha = tk.Button(self.frame_izquierda, text="Marcha", activebackground="mediumblue", activeforeground="white", font=("Helvetica", 14, "bold"), command=self.iniciar_movimiento, width=18, bg="light goldenrod", fg="black")
-        self.boton_marcha.pack(pady=5, padx=5)
+        self.boton_empezar_carrera = customtkinter.CTkButton(self.frame_izquierda, text="Empezar Carrera", hover_color="pale green", text_color="black", font=("Helvetica", 20, "bold"), command=self.empezar_carrera, width=150, height=30, fg_color="light goldenrod")
+        self.boton_empezar_carrera.pack(pady=5)
+
+        self.boton_marcha = customtkinter.CTkButton(self.frame_izquierda, text="Marcha", hover_color="pale green", text_color="black", font=("Helvetica", 20, "bold"), command=self.iniciar_movimiento, width=150, height=30, fg_color="light goldenrod", state=tk.DISABLED)
+        self.boton_marcha.pack(pady=5)
      
-        self.boton_parada = tk.Button(self.frame_izquierda, text="Parada", activebackground="mediumblue", activeforeground="white", font=("Helvetica", 14, "bold"), command=self.detener_movimiento, width=18, bg="light goldenrod", fg="black")
-        self.boton_parada.pack(pady=5, padx=5)
-
-        self.boton_configurar = tk.Button(self.frame_izquierda, text="Configurar tarifas", activebackground="mediumblue", activeforeground="white", font=("Helvetica", 14, "bold"), command=self.configurar_tarifas, width=18, bg="light goldenrod", fg="black")
-        self.boton_configurar.pack(pady=5, padx=5)
-
-        self.boton_cambiar_contraseña = tk.Button(self.frame_izquierda, text="Cambiar contraseña", activebackground="mediumblue", activeforeground="white", font=("Helvetica", 14, "bold"), command=self.cambiar_contraseña, width=18, bg="light goldenrod", fg="black")
-        self.boton_cambiar_contraseña.pack(pady=5, padx=5)
+        self.boton_parada = customtkinter.CTkButton(self.frame_izquierda, text="Parada", font=("Helvetica", 20, "bold"), command=self.detener_movimiento, width=150, height=30, hover_color="tomato", text_color="black", fg_color="light goldenrod", state=tk.DISABLED)
+        self.boton_parada.pack(pady=5)
         
-        self.boton_quit = tk.Button(self.frame_izquierda, text="Exit", activebackground="mediumblue", activeforeground="white", font=("helvetica", 14, "bold"), command=root.quit, width=18, bg="light goldenrod", fg="black")
-        self.boton_quit.pack(pady=5, padx=5)
-    
-        self.actualizar_tiempo_costo()
+        self.boton_configurar = customtkinter.CTkButton(self.frame_izquierda, text="Tarifas", font=("Helvetica", 20, "bold"), command=self.configurar_tarifas, width=150, height=30, hover_color="cyan", text_color="black", fg_color="light goldenrod")
+        self.boton_configurar.pack(pady=5)
+
+        self.boton_cambiar_contraseña = customtkinter.CTkButton(self.frame_izquierda, text="Contraseña", font=("Helvetica", 20, "bold"), command=self.cambiar_contraseña, width=150, height=30, hover_color="cyan", text_color="black", fg_color="light goldenrod")
+        self.boton_cambiar_contraseña.pack(pady=5)
+        
+        self.boton_quit = customtkinter.CTkButton(self.frame_izquierda, text="Exit", font=("Helvetica", 20, "bold"), command=self.root.destroy, width=150, height=30, hover_color="cyan", text_color="black", fg_color="light goldenrod")
+        self.boton_quit.pack(pady=5)
+
+        self.carrera_iniciada = False
+        self.actualizar_canvas(self.canvas_tiempo, "00:00:00")
+        self.actualizar_canvas(self.canvas_euros, "0.00 €")
+        
+        self.carrera_iniciada = False
+        self.actualizar_canvas(self.canvas_tiempo, "00:00:00")
+        self.actualizar_canvas(self.canvas_euros, "0.00 €")
+
+        self.root.deiconify()
 
     def actualizar_tiempo_costo(self):
         tiempo_actual = time.time()
@@ -131,54 +232,73 @@ class Taximetro:
         intentos = 3
         while intentos > 0:
             if not self.autenticado:
-                entered_password = simpledialog.askstring("Autenticación", "Ingresa la contraseña para continuar:", show='*')
-                if self.verificar_password(entered_password):
-                    self.autenticado = True
-                    logging.info("Contraseña correcta. Acceso concedido.")
+                root.deiconify()  # Show the root window
+                dialog = CustomPasswordDialog(root, "Ingresa la contraseña para continuar:")
+                root.withdraw()  # Hide the root window again
+                root.wait_window(dialog)
+                
+                if dialog.result is not None:
+                    if self.verify_password(dialog.result):
+                        self.autenticado = True
+                        logging.info("Contraseña correcta. Acceso concedido.")
+                        break
+                    else:
+                        intentos -= 1
+                        if intentos > 0:
+                            self.show_custom_error(f"Contraseña incorrecta. Te quedan {intentos} intentos.")
+                        logging.warning("Intento de acceso con contraseña incorrecta.")
                 else:
-                    messagebox.showerror("Error", "Contraseña incorrecta. Inténtalo de nuevo.")
-                    logging.warning("Intento de acceso con contraseña incorrecta.")
-                    intentos -= 1
+                    return
             else:
                 break
 
         if intentos == 0:
             logging.error("Número máximo de intentos alcanzado. Cierre del programa.")
-            messagebox.showerror("Error", "Número máximo de intentos alcanzado. Cierre del programa.")
-            root.destroy()
+            root.deiconify()
+            self.show_custom_error("Número máximo de intentos alcanzado. Cierre del programa.")
+            root.quit()
     
     #aseguramos que la app reconoce contraseñas introducidas no hasheadas
-    def verificar_password(self, entered_password):
+    def verify_password(self, entered_password):
         return entered_password == self.password_plaintext or self.hash_password(entered_password) == self.password_hash
 
     def cambiar_contraseña(self):
         if not self.autenticado:
             logging.warning("No se ha autenticado. Debes autenticarte para cambiar la contraseña.")
-            messagebox.showerror("Error", "No se ha autenticado. Debes autenticarte para cambiar la contraseña.")
+            self.show_custom_error("No se ha autenticado. Debes autenticarte para cambiar la contraseña.")
             return
         
-        while True:
-
-            new_password = simpledialog.askstring("Cambiar contraseña", "Introduce la nueva contraseña:", show='*')
+        # First dialog for new password
+        dialog_new = CustomPasswordDialog(self.root, "Introduce la nueva contraseña:", "Nueva Contraseña")
+        self.root.wait_window(dialog_new)
+        
+        if dialog_new.result is None:
+            logging.warning("Cambio de contraseña cancelado.")
+            return
+    
+        new_password = dialog_new.result
             
-            if not self.validate_password(new_password):
-                messagebox.showerror("Error", "La nueva contraseña no cumple los requisitos. Debe tener al menos 6 caracteres y solo puede contener letras, números y los caracteres . - _")
-            else:
-                break
-            
-        confirm_password = simpledialog.askstring("Cambiar contraseña", "Confirma la nueva contraseña:", show='*')
-
-        if new_password == confirm_password:
+        if not self.validate_password(new_password):
+            self.show_custom_warning("La nueva contraseña no cumple los requisitos.  \nDebe tener al menos 6 caracteres y solo puede contener letras, números y los caracteres . - _")
+            return
+        
+        dialog_confirm = CustomPasswordDialog(self.root, "Confirma la nueva contraseña:", "Confirmar Contraseña")
+        self.root.wait_window(dialog_confirm)
+        
+        if dialog_confirm.result is None:
+            logging.warning("Cambio de contraseña cancelado.")
+            return
+        
+        if new_password == dialog_confirm.result:
             self.password_hash = self.hash_password(new_password)
+            self.password_plaintext = new_password
             logging.info("Contraseña cambiada exitosamente.")
-            messagebox.showinfo("Éxito", "Contraseña cambiada exitosamente.")
-
+            self.show_custom_info("Contraseña cambiada exitosamente.")
             self.autenticado = False
             self.autenticar(self.root)
-
         else:
-            logging.warning("La nueva contraseña no coincide con la confirmación.")
-            messagebox.showerror("Error", "La nueva contraseña no coincide con la confirmación.")
+            self.show_custom_error( "Las contraseñas no coinciden.")
+            logging.warning("Las contraseñas no coinciden en el cambio de contraseña.")
 
     def validate_password(self, contraseña):
         if len(contraseña) < 6:
@@ -189,44 +309,35 @@ class Taximetro:
     
     def crear_tabla_registros(self):
         try:
-            with sqlite3.connect(self.db_path) as conn: # desde la linea 17 trae la ruta de código de la base de datos en la declaraciónd de la clase, 
-                cursor = conn.cursor()
-                cursor.execute('''
-                    CREATE TABLE IF NOT EXISTS registros (
-                        id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        tiempo_inicio TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                        tiempo_fin TIMESTAMP,
-                        tiempo_parado REAL,
-                        tiempo_movimiento REAL,
-                        total_euros REAL
-                    )
-                ''')
-                logging.info("Tabla 'registros' creada correctamente.")
+            self.conexion_bd = sqlite3.connect("registros.db")
+            cursor = self.conexion_bd.cursor()
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS registros (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    tiempo_inicio TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    tiempo_fin TIMESTAMP,
+                    tiempo_parado REAL,
+                    tiempo_movimiento REAL,
+                    total_euros REAL
+                )
+            ''')
+            self.conexion_bd.commit()
+            logging.info("Tabla 'registros' creada correctamente.")
         except sqlite3.Error as e:
             logging.error(f"Error al crear la tabla 'registros': {e}")
-
-    def insertar_registros(self,tiempo_inicio, tiempo_fin, tiempo_parado, tiempo_movimiento, total_euros): # permite insertar varias filas a la vez
+    
+    def insertar_registro(self, tiempo_inicio, tiempo_fin, tiempo_parado, tiempo_movimiento, total_euros):
         try:
-            with sqlite3.connect(self.db_path) as conn:
-                cursor = conn.cursor()
-                cursor.execute('''
-                    INSERT INTO registros (tiempo_inicio, tiempo_fin, tiempo_parado, tiempo_movimiento, total_euros) 
-                    VALUES (?, ?, ?, ?, ?)
-                ''', (tiempo_inicio, tiempo_fin, tiempo_parado, tiempo_movimiento, total_euros))
-                logging.info("Registro insertado correctamente en la tabla 'registros'.")
+            cursor = self.conexion_bd.cursor()
+            cursor.execute('''
+                INSERT INTO registros (tiempo_inicio, tiempo_fin, tiempo_parado, tiempo_movimiento, total_euros)
+                VALUES (?, ?, ?, ?, ?)
+            ''', (tiempo_inicio, tiempo_fin, tiempo_parado, tiempo_movimiento, total_euros))
+            self.conexion_bd.commit()
+            logging.info("Registro insertado correctamente en la tabla 'registros'.")
         except sqlite3.Error as e:
             logging.error(f"Error al insertar registro en la tabla 'registros': {e}")
 
-    def read_rows(): # permite leer, todos los registros para devolver la totalidad de los datos
-        try:
-            with sqlite3.connect(self.db_path) as conn:
-                cursor = conn.cursor()
-                cursor.execute("SELECT * FROM registros") # 
-                datos = cursor.fetchall() # este comando puede cambiarse para devolver solo eso
-                return datos
-        except sqlite3.Error as e:
-            logging.error(f"Error al leer registros de la tabla 'registros': {e}")
-            return []
 
     def configurar_tarifas(self):
         if not self.autenticado:
@@ -240,8 +351,8 @@ class Taximetro:
             self.tarifa_parado = nueva_tarifa_parado
             self.tarifa_movimiento = nueva_tarifa_movimiento
             logging.info("Tarifas actualizadas en parado: %.2f, y en movimiento: %.2f", self.tarifa_parado, self.tarifa_movimiento)
-            self.tarifa_parado_label.config(text=f"Tarifa en parado: {self.tarifa_parado:.2f} €/minuto")
-            self.tarifa_movimiento_label.config(text=f"Tarifa en movimiento: {self.tarifa_movimiento:.2f} €/minuto")
+            self.tarifa_parado_label.configure(text=f"Tarifa en parado: {self.tarifa_parado:.2f} €/minuto")
+            self.tarifa_movimiento_label.configure(text=f"Tarifa en movimiento: {self.tarifa_movimiento:.2f} €/minuto")
             messagebox.showinfo("Éxito", "Tarifas actualizadas.")
         except ValueError:
             logging.error("Error al introducir tarifas. Valores no numéricos.")
@@ -259,7 +370,15 @@ class Taximetro:
         self.en_movimiento = en_movimiento
         self.tiempo_ultimo_cambio = tiempo_actual
         estado = "movimiento" if en_movimiento else "parado"
-        self.estado_label.config(text=f"Taxi en {estado}.")
+        self.estado_label.configure(text=f"Taxi en {estado}.")
+    
+        if en_movimiento:
+            self.boton_marcha.configure(state=tk.DISABLED)
+            self.boton_parada.configure(state=tk.NORMAL)
+        else:
+            self.boton_marcha.configure(state=tk.NORMAL)
+            self.boton_parada.configure(state=tk.DISABLED)
+    
         logging.info(f"Taxi en {estado}.")
     
     def iniciar_movimiento(self):
@@ -282,12 +401,16 @@ class Taximetro:
             tiempo_movimiento=self.tiempo_movimiento,
             total_euros=self.total_euros
         )
+
         self.resetear_valores()
         self.preguntar_nueva_carrera()
     
     def preguntar_nueva_carrera(self):
         nueva_carrera = messagebox.askyesno("Nueva carrera", "¿Deseas iniciar una nueva carrera?")
-        if not nueva_carrera:
+        if nueva_carrera:
+            self.en_movimiento = False
+            self.empezar_carrera()
+        else:
             self.root.destroy()
     
     def resetear_valores(self):
@@ -297,7 +420,10 @@ class Taximetro:
         self.tiempo_ultimo_cambio = time.time()
         self.tiempo_parado = 0
         self.tiempo_movimiento = 0
-    
+        self.carrera_iniciada = False
+        self.actualizar_canvas(self.canvas_tiempo, "00:00:00")
+        self.actualizar_canvas(self.canvas_euros, "0.00 €")
+        
     def __del__(self):
         try:
             if self.conexion_bd:
@@ -316,5 +442,6 @@ if __name__ == "__main__":
     args = parse_args()
     taximetro = Taximetro(args.password)
     root = tk.Tk()
+    root.withdraw()
     taximetro.iniciar_carrera(root)
     root.mainloop()
