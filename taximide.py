@@ -7,7 +7,6 @@ import tkinter as tk
 import customtkinter
 from tkinter import messagebox, simpledialog
 import sqlite3
-import os
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', handlers=[
     logging.FileHandler("taximideapp.log"), 
@@ -35,12 +34,15 @@ class CustomPasswordDialog(tk.Toplevel):
 
         self.cancel_button = customtkinter.CTkButton(self.body_frame, text="Cancel", command=self.cancel, font=("Helvetica", 20), hover_color="pale green", text_color="black",  fg_color="light goldenrod", width=100, height=30)
         self.cancel_button.pack(side=tk.RIGHT, padx=50)
-        # customtkinter.CTkButton(self.frame_izquierda, text="Empezar Carrera", hover_color="pale green", text_color="black", font=("Helvetica", 20, "bold"), command=self.empezar_carrera, width=150, height=30, fg_color="light goldenrod")
+        
         self.protocol("WM_DELETE_WINDOW", self.cancel)
+        self.grab_set()
         self.geometry("500x200")
+        self.attributes('-topmost', True)
         self.result = None
 
         self.bind("<Return>", lambda event: self.ok())
+        self.bind("<Escape>", lambda event: self.cancel())
         
     def ok(self):
         self.result = self.entry.get()
@@ -48,7 +50,7 @@ class CustomPasswordDialog(tk.Toplevel):
     
     def cancel(self):
         self.result = None
-        self.destroy()
+        self.parent.destroy()
 
 class CustomNotificationDialog(tk.Toplevel):
     def __init__(self, parent, message, title, color):
@@ -67,13 +69,16 @@ class CustomNotificationDialog(tk.Toplevel):
         
 
         self.protocol("WM_DELETE_WINDOW", self.destroy)
+        self.grab_set()
         self.geometry("500x250")
+        self.attributes('-topmost', True)
 
         self.bind("<Return>", lambda event: self.destroy())
 
 
 class Taximetro:
     def __init__(self, contraseña):
+        self.db_path = 'taximetro.db'
         self.tarifa_parado = 0.02
         self.tarifa_movimiento = 0.05
         self.tiempo_total = 0
@@ -165,9 +170,7 @@ class Taximetro:
         self.canva_fin = customtkinter.CTkButton(self.frame_derecha, text="Fin", font=("helvetica", 24, "bold"), command=self.finalizar_carrera, width=150, height=50, hover_color="tomato", text_color="blue4", fg_color="grey60", state=tk.DISABLED)
         self.canva_fin.pack(pady=5)
         
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        self.logo_image = tk.PhotoImage(file=os.path.join(current_dir, "logo.png")).subsample(3, 3)
-
+        self.logo_image = tk.PhotoImage(file="logo.png").subsample(3, 3)
         self.logo_label = tk.Label(self.frame_izquierda,image=self.logo_image, bg="#3498db")
         self.logo_label.pack(pady=5)
 
@@ -186,7 +189,7 @@ class Taximetro:
         self.boton_cambiar_contraseña = customtkinter.CTkButton(self.frame_izquierda, text="Contraseña", font=("Helvetica", 20, "bold"), command=self.cambiar_contraseña, width=150, height=30, hover_color="cyan", text_color="black", fg_color="light goldenrod")
         self.boton_cambiar_contraseña.pack(pady=5)
         
-        self.boton_quit = customtkinter.CTkButton(self.frame_izquierda, text="Exit", font=("Helvetica", 20, "bold"), command=self.root.quit, width=150, height=30, hover_color="cyan", text_color="black", fg_color="light goldenrod")
+        self.boton_quit = customtkinter.CTkButton(self.frame_izquierda, text="Exit", font=("Helvetica", 20, "bold"), command=self.root.destroy, width=150, height=30, hover_color="cyan", text_color="black", fg_color="light goldenrod")
         self.boton_quit.pack(pady=5)
 
         self.carrera_iniciada = False
@@ -196,6 +199,8 @@ class Taximetro:
         self.carrera_iniciada = False
         self.actualizar_canvas(self.canvas_tiempo, "00:00:00")
         self.actualizar_canvas(self.canvas_euros, "0.00 €")
+
+        self.root.deiconify()
 
     def actualizar_tiempo_costo(self):
         tiempo_actual = time.time()
@@ -228,7 +233,9 @@ class Taximetro:
         intentos = 3
         while intentos > 0:
             if not self.autenticado:
+                root.deiconify()  # Show the root window
                 dialog = CustomPasswordDialog(root, "Ingresa la contraseña para continuar:")
+                root.withdraw()  # Hide the root window again
                 root.wait_window(dialog)
                 
                 if dialog.result is not None:
@@ -248,6 +255,7 @@ class Taximetro:
 
         if intentos == 0:
             logging.error("Número máximo de intentos alcanzado. Cierre del programa.")
+            root.deiconify()
             self.show_custom_error("Número máximo de intentos alcanzado. Cierre del programa.")
             root.quit()
     
