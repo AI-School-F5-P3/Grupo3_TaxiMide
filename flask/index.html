@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taxímetro Digital</title>
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Taxímetro Digital 🚕</h1>
+        <div id="info">
+            <p id="estado"></p>
+            <p>Tiempo Total: <span id="tiempo_total">0</span> seg</p>
+            <p>Total a Cobrar: <span id="total_cobrar">0.00</span> €</p>
+            <p>Tarifa Actual: <span id="tarifa_actual">0.00</span> €/seg</p>
+        </div>
+        <div id="botones">
+            <button id="iniciar">🚗 Iniciar Movimiento</button>
+            <button id="detener">🛑 Detener Movimiento</button>
+            <button id="configurar">⚙️ Configurar Tarifas</button>
+            <button id="cambiar_contraseña">🔐 Cambiar Contraseña</button>
+            <button id="finalizar">🏁 Finalizar Programa</button>
+        </div>
+    </div>
+    <script src="/static/scripts.js"></script>
+</body>
+</html>

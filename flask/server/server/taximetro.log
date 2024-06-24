@@ -1,0 +1,14 @@
+2024-06-23 01:56:39,333 - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2024-06-23 01:56:39,333 - [33mPress CTRL+C to quit[0m
+2024-06-23 01:56:39,338 -  * Restarting with stat
+2024-06-23 01:56:39,532 -  * Debugger is active!
+2024-06-23 01:56:39,546 -  * Debugger PIN: 108-149-716
+2024-06-23 01:57:32,225 -  * Detected change in '/Users/cash/Desktop/F5/Grupo3_TaxiMide/flask/server/app.py', reloading
+2024-06-23 01:57:32,256 -  * Restarting with stat
+2024-06-23 01:57:45,898 - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5001
+2024-06-23 01:57:45,898 - [33mPress CTRL+C to quit[0m
+2024-06-23 01:57:45,902 -  * Restarting with stat
+2024-06-23 01:57:46,094 -  * Debugger is active!
+2024-06-23 01:57:46,118 -  * Debugger PIN: 108-149-716
