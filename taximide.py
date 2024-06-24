@@ -397,7 +397,7 @@ class Taximetro:
         self.total_euros = (self.tiempo_movimiento * self.tarifa_movimiento) + (self.tiempo_parado * self.tarifa_parado)
         self.total_label.config(text=f"Total a cobrar: {self.total_euros:.2f} euros")
         messagebox.showinfo("Carrera finalizada", f"Total a cobrar: {self.total_euros:.2f} euros")
-        self.insertar_registro(
+        self.insertar_registros(
             tiempo_inicio=self.tiempo_ultimo_cambio - (self.tiempo_parado + self.tiempo_movimiento),
             tiempo_fin=self.tiempo_ultimo_cambio,
             tiempo_parado=self.tiempo_parado,
