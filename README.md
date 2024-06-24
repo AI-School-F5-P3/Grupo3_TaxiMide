@@ -4,12 +4,37 @@
 </div>
 
 # Bienvenido a nuestro primer proyecto! Un taxímetro inteligente.🚕
-Este taxímetro inteligente te permitirá cambiar el precio por segundo de tu viaje, tanto si estas parado como en movimiento. Además, tiene la funcionalidad de establecer una contraseña para iniciar el uso del taxímetro y comenzar la carrera del cliente. ¡Con esto cuentas con una seguridad extra en tu viaje!
+Este proyecto es una aplicación GUI para un taxímetro digital, desarrollada en Python utilizando las bibliotecas tkinter y customtkinter. La aplicación permite calcular las tarifas de un taxi en movimiento y en parado, gestionar contraseñas para configurar tarifas, y registrar los viajes en una base de datos SQLite
 
-## Funcionalidades!📱
-1. **Cambio del precio por segundo (parado):**
-    - Puedes ajustar el precio cuando estás parado según consideres y así tener una ventaja en la competencia. 
-2. **Cambio del precio por segundo (en movimiento):**
-    - Puedes ajustar el precio de cuando estés en carrera llevando a tu cliente según consideres.
-3. **Seguridad asegurada:**
-    - Para comenzar a utilizar el taxímetro y empezar la carrera del cliente, ¡deberás iniciar sesión y empezar la carrera!
+## Características
+* Tarifas por defecto: 0.02 €/minuto en parado y 0.05 €/minuto en movimiento.
+* Autenticación: Protección con contraseña para acceder a las funciones de configuración.
+* Interfaz gráfica: Fácil de usar, con botones para iniciar/parar el movimiento y finalizar la carrera.
+* Registros: Almacena los datos de los viajes (tiempo y costo) en una base de datos SQLite.
+* Configuración de tarifas: Permite cambiar las tarifas de paro y movimiento.
+* Gestión de contraseñas: Capacidad de cambiar la contraseña con validación de requisitos mínimos.
+
+## Requisitos
+* Python 3.x
+* Bibliotecas: hashlib, re, time, logging, argparse, tkinter, customtkinter, sqlite3
+
+## Instalación
+1. Clonar el repositorio:
+Copiar código
+git clone https://github.com/tu_usuario/taximetro.git
+
+2. Instalar las dependencias:
+pip install customtkinter
+
+3. Ejecutar la aplicación:
+python taximetro.py --password tu_contraseña
+
+## Uso
+1. Iniciar la aplicación: Al iniciar, se solicitará la contraseña configurada para poder acceder a las funciones de la aplicación.
+2. Interfaz principal:
+  * Marcha: Inicia el conteo del tiempo en movimiento.
+  * Parada: Detiene el conteo del tiempo en movimiento y lo cambia a tiempo en parado.
+  * Tarifas: Permite configurar nuevas tarifas para el tiempo en movimiento y en parado.
+  * Contraseña: Permite cambiar la contraseña actual.
+  * Exit: Cierra la aplicación.
+3. Finalizar la carrera: Calcula el total a cobrar y guarda los datos en la base de datos.
