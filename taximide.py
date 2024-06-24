@@ -7,7 +7,6 @@ import tkinter as tk
 import customtkinter
 from tkinter import messagebox, simpledialog
 import sqlite3
-import os
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', handlers=[
     logging.FileHandler("taximideapp.log"), 
@@ -41,6 +40,7 @@ class CustomPasswordDialog(tk.Toplevel):
         self.result = None
 
         self.bind("<Return>", lambda event: self.ok())
+        self.bind("<Escape>", lambda event: self.cancel())
         
     def ok(self):
         self.result = self.entry.get()
@@ -48,7 +48,7 @@ class CustomPasswordDialog(tk.Toplevel):
     
     def cancel(self):
         self.result = None
-        self.destroy()
+        self.parent.destroy()
 
 class CustomNotificationDialog(tk.Toplevel):
     def __init__(self, parent, message, title, color):
@@ -165,9 +165,7 @@ class Taximetro:
         self.canva_fin = customtkinter.CTkButton(self.frame_derecha, text="Fin", font=("helvetica", 24, "bold"), command=self.finalizar_carrera, width=150, height=50, hover_color="tomato", text_color="blue4", fg_color="grey60", state=tk.DISABLED)
         self.canva_fin.pack(pady=5)
         
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        self.logo_image = tk.PhotoImage(file=os.path.join(current_dir, "logo.png")).subsample(3, 3)
-
+        self.logo_image = tk.PhotoImage(file="logo.png").subsample(3, 3)
         self.logo_label = tk.Label(self.frame_izquierda,image=self.logo_image, bg="#3498db")
         self.logo_label.pack(pady=5)
 
@@ -186,7 +184,7 @@ class Taximetro:
         self.boton_cambiar_contraseña = customtkinter.CTkButton(self.frame_izquierda, text="Contraseña", font=("Helvetica", 20, "bold"), command=self.cambiar_contraseña, width=150, height=30, hover_color="cyan", text_color="black", fg_color="light goldenrod")
         self.boton_cambiar_contraseña.pack(pady=5)
         
-        self.boton_quit = customtkinter.CTkButton(self.frame_izquierda, text="Exit", font=("Helvetica", 20, "bold"), command=self.root.quit, width=150, height=30, hover_color="cyan", text_color="black", fg_color="light goldenrod")
+        self.boton_quit = customtkinter.CTkButton(self.frame_izquierda, text="Exit", font=("Helvetica", 20, "bold"), command=self.root.destroy, width=150, height=30, hover_color="cyan", text_color="black", fg_color="light goldenrod")
         self.boton_quit.pack(pady=5)
 
         self.carrera_iniciada = False
