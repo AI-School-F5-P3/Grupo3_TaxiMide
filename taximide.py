@@ -108,17 +108,19 @@ class Taximetro:
     
     def empezar_carrera(self):
         if not self.carrera_iniciada:
-            self.carrera_iniciada = True
+            self.carrera_iniciada = False
             self.resetear_valores()
             self.tiempo_ultimo_cambio = time.time()
+            self.en_movimiento = False  # Ensure we start in "parado" state
             self.actualizar_tiempo_costo()
             self.estado_label.config(text="Taxi en parado.")
             self.boton_empezar_carrera.config(state=tk.DISABLED)
             self.boton_marcha.config(state=tk.NORMAL)
-            self.boton_parada.config(state=tk.NORMAL)
+            self.boton_parada.config(state=tk.DISABLED)  # Disable "Parada" button initially
             self.canva_fin.config(state=tk.NORMAL)
-            logging.info("Carrera iniciada.")
-    
+            logging.info("Carrera iniciada. Taxi en parado.")
+            self.actualizar_tiempo_costo()
+        
 
     def iniciar_carrera(self, root):
         self.root = root
@@ -180,8 +182,14 @@ class Taximetro:
         
         self.boton_quit = customtkinter.CTkButton(self.frame_izquierda, text="Exit", font=("Helvetica", 20, "bold"), command=self.root.quit, width=150, height=30, hover_color="cyan", text_color="black", fg_color="light goldenrod")
         self.boton_quit.pack(pady=5)
-    
-        self.actualizar_tiempo_costo()
+
+        self.carrera_iniciada = False
+        self.actualizar_canvas(self.canvas_tiempo, "00:00:00")
+        self.actualizar_canvas(self.canvas_euros, "0.00 €")
+        
+        self.carrera_iniciada = False
+        self.actualizar_canvas(self.canvas_tiempo, "00:00:00")
+        self.actualizar_canvas(self.canvas_euros, "0.00 €")
 
     def actualizar_tiempo_costo(self):
         tiempo_actual = time.time()
@@ -350,6 +358,14 @@ class Taximetro:
         self.tiempo_ultimo_cambio = tiempo_actual
         estado = "movimiento" if en_movimiento else "parado"
         self.estado_label.config(text=f"Taxi en {estado}.")
+    
+        if en_movimiento:
+            self.boton_marcha.config(state=tk.DISABLED)
+            self.boton_parada.config(state=tk.NORMAL)
+        else:
+            self.boton_marcha.config(state=tk.NORMAL)
+            self.boton_parada.config(state=tk.DISABLED)
+    
         logging.info(f"Taxi en {estado}.")
     
     def iniciar_movimiento(self):
@@ -372,12 +388,16 @@ class Taximetro:
             tiempo_movimiento=self.tiempo_movimiento,
             total_euros=self.total_euros
         )
+
         self.resetear_valores()
         self.preguntar_nueva_carrera()
     
     def preguntar_nueva_carrera(self):
         nueva_carrera = messagebox.askyesno("Nueva carrera", "¿Deseas iniciar una nueva carrera?")
-        if not nueva_carrera:
+        if nueva_carrera:
+            self.en_movimiento = False
+            self.empezar_carrera()
+        else:
             self.root.destroy()
     
     def resetear_valores(self):
@@ -387,7 +407,10 @@ class Taximetro:
         self.tiempo_ultimo_cambio = time.time()
         self.tiempo_parado = 0
         self.tiempo_movimiento = 0
-    
+        self.carrera_iniciada = False
+        self.actualizar_canvas(self.canvas_tiempo, "00:00:00")
+        self.actualizar_canvas(self.canvas_euros, "0.00 €")
+        
     def __del__(self):
         try:
             if self.conexion_bd:
