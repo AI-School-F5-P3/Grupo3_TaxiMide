@@ -96,7 +96,7 @@ class Taximetro:
         self.canvas_euros = tk.Canvas(self.frame_derecha, width=300, height=50, bg="grey", highlightthickness=5)
         self.canvas_euros.pack(pady=10)
        
-        self.canva_fin = tk.Button(self.frame_derecha, text="Fin", activebackground="red", font=("helvetica", 14, "bold"), command=self.finalizar_carrera, width=18, fg="dodgerblue", bg="grey24")
+        self.canva_fin = customtkinter.CTkButton(self.frame_derecha, text="Fin", font=("helvetica", 24, "bold"), command=self.finalizar_carrera, width=150, height=50, hover_color="tomato", text_color="blue4", fg_color="grey60")
         self.canva_fin.pack(pady=5)
         
         self.actualizar_tiempo_costo()
