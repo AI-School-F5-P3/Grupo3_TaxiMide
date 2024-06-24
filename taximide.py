@@ -74,6 +74,7 @@ class CustomNotificationDialog(tk.Toplevel):
 
 class Taximetro:
     def __init__(self, contraseña):
+        self.db_path = 'taximetro.db' # Al definir una ruta de base de datos aquí, se define en el resto del código, puede servir para la declaración de otras bases de datos
         self.tarifa_parado = 0.02
         self.tarifa_movimiento = 0.05
         self.tiempo_total = 0
@@ -297,37 +298,48 @@ class Taximetro:
         if not re.match("^[a-zA-Z0-9._-]+$", contraseña):
             return False
         return True
+
     
     def crear_tabla_registros(self):
         try:
-            self.conexion_bd = sqlite3.connect("registros.db")
-            cursor = self.conexion_bd.cursor()
-            cursor.execute('''
-                CREATE TABLE IF NOT EXISTS registros (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    tiempo_inicio TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    tiempo_fin TIMESTAMP,
-                    tiempo_parado REAL,
-                    tiempo_movimiento REAL,
-                    total_euros REAL
-                )
-            ''')
-            self.conexion_bd.commit()
-            logging.info("Tabla 'registros' creada correctamente.")
+            with sqlite3.connect(self.db_path) as conn: # desde la linea 17 trae la ruta de código de la base de datos en la declaraciónd de la clase, 
+                cursor = conn.cursor()
+                cursor.execute('''
+                    CREATE TABLE IF NOT EXISTS registros (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        tiempo_inicio TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        tiempo_fin TIMESTAMP,
+                        tiempo_parado REAL,
+                        tiempo_movimiento REAL,
+                        total_euros REAL
+                    )
+                ''')
+                logging.info("Tabla 'registros' creada correctamente.")
         except sqlite3.Error as e:
             logging.error(f"Error al crear la tabla 'registros': {e}")
-    
-    def insertar_registro(self, tiempo_inicio, tiempo_fin, tiempo_parado, tiempo_movimiento, total_euros):
+
+    def insertar_registros(self,tiempo_inicio, tiempo_fin, tiempo_parado, tiempo_movimiento, total_euros): # permite insertar varias filas a la vez
         try:
-            cursor = self.conexion_bd.cursor()
-            cursor.execute('''
-                INSERT INTO registros (tiempo_inicio, tiempo_fin, tiempo_parado, tiempo_movimiento, total_euros)
-                VALUES (?, ?, ?, ?, ?)
-            ''', (tiempo_inicio, tiempo_fin, tiempo_parado, tiempo_movimiento, total_euros))
-            self.conexion_bd.commit()
-            logging.info("Registro insertado correctamente en la tabla 'registros'.")
+            with sqlite3.connect(self.db_path) as conn:
+                cursor = conn.cursor()
+                cursor.execute('''
+                    INSERT INTO registros (tiempo_inicio, tiempo_fin, tiempo_parado, tiempo_movimiento, total_euros) 
+                    VALUES (?, ?, ?, ?, ?)
+                ''', (tiempo_inicio, tiempo_fin, tiempo_parado, tiempo_movimiento, total_euros))
+                logging.info("Registro insertado correctamente en la tabla 'registros'.")
         except sqlite3.Error as e:
             logging.error(f"Error al insertar registro en la tabla 'registros': {e}")
+
+    def read_rows(): # permite leer, todos los registros para devolver la totalidad de los datos
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                cursor = conn.cursor()
+                cursor.execute("SELECT * FROM registros") # 
+                datos = cursor.fetchall() # este comando puede cambiarse para devolver solo eso
+                return datos
+        except sqlite3.Error as e:
+            logging.error(f"Error al leer registros de la tabla 'registros': {e}")
+            return []
 
 
     def configurar_tarifas(self):
