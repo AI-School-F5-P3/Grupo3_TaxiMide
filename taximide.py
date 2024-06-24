@@ -37,6 +37,8 @@ class CustomPasswordDialog(tk.Toplevel):
         self.protocol("WM_DELETE_WINDOW", self.cancel)
         self.geometry("500x200")
         self.result = None
+
+        self.bind("<Return>", lambda event: self.ok())
         
     def ok(self):
         self.result = self.entry.get()
@@ -63,6 +65,8 @@ class CustomNotificationDialog(tk.Toplevel):
 
         self.protocol("WM_DELETE_WINDOW", self.destroy)
         self.geometry("500x250")
+
+        self.bind("<Return>", lambda event: self.destroy())
 
 
 class Taximetro:
