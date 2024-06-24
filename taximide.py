@@ -76,6 +76,7 @@ class Taximetro:
         self.tarifa_movimiento = 0.05
         self.tiempo_total = 0
         self.total_euros = 0
+        self.carrera_iniciada = False
         self.en_movimiento = False
         self.tiempo_ultimo_cambio = time.time()
         self.tiempo_parado = 0
@@ -104,6 +105,19 @@ class Taximetro:
         password_hash = hasher.hexdigest()
         
         return password_hash
+    
+    def empezar_carrera(self):
+        if not self.carrera_iniciada:
+            self.carrera_iniciada = True
+            self.resetear_valores()
+            self.tiempo_ultimo_cambio = time.time()
+            self.actualizar_tiempo_costo()
+            self.estado_label.config(text="Taxi en parado.")
+            self.boton_empezar_carrera.config(state=tk.DISABLED)
+            self.boton_marcha.config(state=tk.NORMAL)
+            self.boton_parada.config(state=tk.NORMAL)
+            self.canva_fin.config(state=tk.NORMAL)
+            logging.info("Carrera iniciada.")
     
 
     def iniciar_carrera(self, root):
@@ -157,7 +171,7 @@ class Taximetro:
      
         self.boton_parada = customtkinter.CTkButton(self.frame_izquierda, text="Parada", font=("Helvetica", 20, "bold"), command=self.detener_movimiento, width=150, height=30, hover_color="tomato", text_color="black", fg_color="light goldenrod")
         self.boton_parada.pack(pady=5)
-
+        
         self.boton_configurar = customtkinter.CTkButton(self.frame_izquierda, text="Tarifas", font=("Helvetica", 20, "bold"), command=self.configurar_tarifas, width=150, height=30, hover_color="cyan", text_color="black", fg_color="light goldenrod")
         self.boton_configurar.pack(pady=5)
 
