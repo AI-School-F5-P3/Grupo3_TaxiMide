@@ -26,15 +26,15 @@ class CustomPasswordDialog(tk.Toplevel):
         self.label.pack(pady=(0, 10))
 
         self.entry = tk.Entry(self.body_frame, show="*", font=("Helvetica", 12), bg="lightgrey", fg="black")
-        self.entry.pack(pady=(0, 10))
+        self.entry.pack(pady=(10, 10))
         self.entry.focus_set()
 
-        self.ok_button = tk.Button(self.body_frame, text="OK", command=self.ok, font=("Helvetica", 12), bg="light goldenrod", fg="black", activebackground="mediumblue", activeforeground="white", width=12)
+        self.ok_button = customtkinter.CTkButton(self.body_frame, text="OK", command=self.ok, font=("Helvetica", 20), hover_color="pale green", text_color="black",  fg_color="light goldenrod", width=100, height=30)
         self.ok_button.pack(side=tk.LEFT, padx=50)
 
-        self.cancel_button = tk.Button(self.body_frame, text="Cancel", command=self.cancel, font=("Helvetica", 12), bg="light goldenrod", fg="black", activebackground="mediumblue", activeforeground="white", width=12)
+        self.cancel_button = customtkinter.CTkButton(self.body_frame, text="Cancel", command=self.cancel, font=("Helvetica", 20), hover_color="pale green", text_color="black",  fg_color="light goldenrod", width=100, height=30)
         self.cancel_button.pack(side=tk.RIGHT, padx=50)
-
+        # customtkinter.CTkButton(self.frame_izquierda, text="Empezar Carrera", hover_color="pale green", text_color="black", font=("Helvetica", 20, "bold"), command=self.empezar_carrera, width=150, height=30, fg_color="light goldenrod")
         self.protocol("WM_DELETE_WINDOW", self.cancel)
         self.geometry("500x200")
         self.result = None
@@ -61,8 +61,9 @@ class CustomNotificationDialog(tk.Toplevel):
         self.label = tk.Label(self.body_frame, text=message, font=("Helvetica", 14), bg=color, fg="black", wraplength=300)
         self.label.pack(pady=(5, 20))
 
-        self.ok_button = tk.Button(self.body_frame, text="OK", command=self.destroy, font=("Helvetica", 12), bg="gray24", fg="gray90", activebackground="gray90", activeforeground="gray24", width=10)
+        self.ok_button = customtkinter.CTkButton(self.body_frame, text="OK", command=self.destroy, font=("Helvetica", 20), hover_color="pale green", text_color="black",  fg_color="light goldenrod", width=100, height=30)
         self.ok_button.pack(pady=5)
+        
 
         self.protocol("WM_DELETE_WINDOW", self.destroy)
         self.geometry("500x250")
@@ -89,13 +90,13 @@ class Taximetro:
         logging.info("Taxímetro iniciado con tarifas por defecto y contraseña establecida.")
 
     def show_custom_error(self, message):
-        CustomNotificationDialog(self.root, message, "Error", "red3")
+        CustomNotificationDialog(self.root, message, "Error", "tomato")
 
     def show_custom_warning(self, message):
-        CustomNotificationDialog(self.root, message, "Warning", "light goldenrod")
+        CustomNotificationDialog(self.root, message, "Warning", "dark goldenrod")
 
     def show_custom_info(self, message):
-        CustomNotificationDialog(self.root, message, "Info", "dodgerblue")
+        CustomNotificationDialog(self.root, message, "Info", "cyan")
         
         #programamos hashing de contraseñas
     def hash_password(self, password):
@@ -112,7 +113,6 @@ class Taximetro:
             self.resetear_valores()
             self.tiempo_ultimo_cambio = time.time()
             self.en_movimiento = False  # Ensure we start in "parado" state
-            self.actualizar_tiempo_costo()
             self.estado_label.configure(text="Taxi en parado.")
             self.boton_empezar_carrera.configure(state=tk.DISABLED)
             self.boton_marcha.configure(state=tk.NORMAL)
@@ -287,7 +287,7 @@ class Taximetro:
             self.autenticado = False
             self.autenticar(self.root)
         else:
-            self.show_custom_error("Error", "Las contraseñas no coinciden.")
+            self.show_custom_error( "Las contraseñas no coinciden.")
             logging.warning("Las contraseñas no coinciden en el cambio de contraseña.")
 
     def validate_password(self, contraseña):
