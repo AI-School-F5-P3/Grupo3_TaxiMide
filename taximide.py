@@ -198,7 +198,12 @@ class Taximetro:
         self.canva_fin = customtkinter.CTkButton(self.frame_derecha, text="Fin", font=("helvetica", 24, "bold"), command=self.finalizar_carrera, width=150, height=50, hover_color="tomato", text_color="blue4", fg_color="grey60", state=tk.DISABLED)
         self.canva_fin.pack(pady=5)
         
-        self.logo_image = tk.PhotoImage(file=logo_path).subsample(3, 3)
+        try:
+            self.logo_image = tk.PhotoImage(file=logo_path).subsample(3, 3)
+        except tk.TclError as e:
+            print(f"Error al cargar logo.png: {e}")
+            # Puedes asignar un valor predeterminado o manejar la situación de otra manera
+            self.logo_image = None  # Asignar None u otra imagen predeterminada
         self.logo_label = tk.Label(self.frame_izquierda,image=self.logo_image, bg="#3498db")
         self.logo_label.pack(pady=5)
 
