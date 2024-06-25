@@ -175,7 +175,7 @@ class Taximetro:
         self.logo_label = tk.Label(self.frame_izquierda,image=self.logo_image, bg="#3498db")
         self.logo_label.pack(pady=5)
 
-        self.boton_empezar_carrera = customtkinter.CTkButton(self.frame_izquierda, text="Empezar Carrera", hover_color="pale green", text_color="black", font=("Helvetica", 20, "bold"), command=self.empezar_carrera, width=150, height=30, fg_color="light goldenrod")
+        self.boton_empezar_carrera = customtkinter.CTkButton(self.frame_izquierda, text="Start", hover_color="pale green", text_color="black", font=("Helvetica", 20, "bold"), command=self.empezar_carrera, width=150, height=30, fg_color="light goldenrod")
         self.boton_empezar_carrera.pack(pady=5)
 
         self.boton_marcha = customtkinter.CTkButton(self.frame_izquierda, text="Marcha", hover_color="pale green", text_color="black", font=("Helvetica", 20, "bold"), command=self.iniciar_movimiento, width=150, height=30, fg_color="light goldenrod", state=tk.DISABLED)
