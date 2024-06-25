@@ -1,5 +1,6 @@
 import hashlib 
 import re       #importamos librerias
+import os
 import time
 import logging
 import argparse
@@ -141,6 +142,9 @@ class Taximetro:
         self.root.title("TaxiMide")
         self.root.geometry("600x500")
         
+        script_dir = os.path.dirname(__file__)
+        logo_path = os.path.join(script_dir, "logo.png")
+
         #aquí creamos la división de los box donde irán cada elemento dentro
         self.frame_izquierda = tk.Frame(self.root, width=200,bg="dodgerblue" )
         self.frame_izquierda.pack(side=tk.LEFT, fill=tk.Y)
@@ -171,7 +175,7 @@ class Taximetro:
         self.canva_fin = customtkinter.CTkButton(self.frame_derecha, text="Fin", font=("helvetica", 24, "bold"), command=self.finalizar_carrera, width=150, height=50, hover_color="tomato", text_color="blue4", fg_color="grey60", state=tk.DISABLED)
         self.canva_fin.pack(pady=5)
         
-        self.logo_image = tk.PhotoImage(file="logo.png").subsample(3, 3)
+        self.logo_image = tk.PhotoImage(file=logo_path).subsample(3, 3)
         self.logo_label = tk.Label(self.frame_izquierda,image=self.logo_image, bg="#3498db")
         self.logo_label.pack(pady=5)
 
