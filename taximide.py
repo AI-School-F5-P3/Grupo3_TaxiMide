@@ -1,6 +1,7 @@
 import hashlib 
-import re       #importamos librerias
+import re    
 import os
+import json   #importamos librerias
 import time
 import logging
 import argparse
@@ -93,6 +94,7 @@ class Taximetro:
         self.password_plaintext = contraseña
         self.autenticado = False
         self.conexion_bd = None
+        self.load_password(contraseña)
         self.crear_tabla_registros()
         logging.info("Taxímetro iniciado con tarifas por defecto y contraseña establecida.")
 
@@ -114,13 +116,34 @@ class Taximetro:
         
         return password_hash
     
+    def save_password(self):
+        data = {
+            "password_hash": self.password_hash
+        }
+        with open("password.json", "w") as f:
+            json.dump(data, f)
+        logging.info("Contraseña guardada")
+    
+    def load_password(self, default_password):
+        try:
+            with open("password.json", "r") as f:
+                data = json.load(f)
+            self.password_hash = data["password_hash"]
+            
+            logging.info("Contraseña cargada")
+
+        except FileNotFoundError:
+            self.password_hash = self.hash_password(default_password)
+            self.password_plaintext = default_password
+            self.save_password()
+            logging.info("Contraseña por defecto establecida")
+
     def empezar_carrera(self):
         if not self.carrera_iniciada:
             self.carrera_iniciada = False
             self.resetear_valores()
             self.tiempo_ultimo_cambio = time.time()
             self.en_movimiento = False  # Ensure we start in "parado" state
-            self.actualizar_tiempo_costo()
             self.estado_label.configure(text="Taxi en parado.")
             self.boton_empezar_carrera.configure(state=tk.DISABLED)
             self.boton_marcha.configure(state=tk.NORMAL)
@@ -141,10 +164,10 @@ class Taximetro:
         self.root.deiconify()
         self.root.title("TaxiMide")
         self.root.geometry("600x500")
-        
+
         script_dir = os.path.dirname(__file__)
         logo_path = os.path.join(script_dir, "logo.png")
-
+        
         #aquí creamos la división de los box donde irán cada elemento dentro
         self.frame_izquierda = tk.Frame(self.root, width=200,bg="dodgerblue" )
         self.frame_izquierda.pack(side=tk.LEFT, fill=tk.Y)
@@ -179,7 +202,7 @@ class Taximetro:
         self.logo_label = tk.Label(self.frame_izquierda,image=self.logo_image, bg="#3498db")
         self.logo_label.pack(pady=5)
 
-        self.boton_empezar_carrera = customtkinter.CTkButton(self.frame_izquierda, text="Start", hover_color="pale green", text_color="black", font=("Helvetica", 20, "bold"), command=self.empezar_carrera, width=150, height=30, fg_color="light goldenrod")
+        self.boton_empezar_carrera = customtkinter.CTkButton(self.frame_izquierda, text="Start", hover_color="pale green", text_color="black", font=("Helvetica", 18, "bold"), command=self.empezar_carrera, width=150, height=30, fg_color="light goldenrod")
         self.boton_empezar_carrera.pack(pady=5)
 
         self.boton_marcha = customtkinter.CTkButton(self.frame_izquierda, text="Marcha", hover_color="pale green", text_color="black", font=("Helvetica", 20, "bold"), command=self.iniciar_movimiento, width=150, height=30, fg_color="light goldenrod", state=tk.DISABLED)
@@ -235,76 +258,93 @@ class Taximetro:
 
 
     def autenticar(self, root):
-        intentos = 3
-        while intentos > 0:
-            if not self.autenticado:
-                root.deiconify()  # Show the root window
-                dialog = CustomPasswordDialog(root, "Ingresa la contraseña para continuar:")
-                root.withdraw()  # Hide the root window again
-                root.wait_window(dialog)
-                
-                if dialog.result is not None:
-                    if self.verify_password(dialog.result):
-                        self.autenticado = True
-                        logging.info("Contraseña correcta. Acceso concedido.")
-                        break
+        try:
+            intentos = 3
+            while intentos > 0:
+                if not self.autenticado:
+                    root.deiconify()  # Show the root window
+                    dialog = CustomPasswordDialog(root, "Ingresa la contraseña para continuar:")
+                    root.withdraw()  # Hide the root window again
+                    root.wait_window(dialog)
+                    
+                    if dialog.result is not None:
+                        if self.verify_password(dialog.result):
+                            self.autenticado = True
+                            logging.info("Contraseña correcta. Acceso concedido.")
+                            break
+                        else:
+                            intentos -= 1
+                            if intentos > 0:
+                                self.show_custom_error(f"Contraseña incorrecta. Te quedan {intentos} intentos.")
+                            logging.warning("Intento de acceso con contraseña incorrecta.")
                     else:
-                        intentos -= 1
-                        if intentos > 0:
-                            self.show_custom_error(f"Contraseña incorrecta. Te quedan {intentos} intentos.")
-                        logging.warning("Intento de acceso con contraseña incorrecta.")
+                        return
                 else:
-                    return
-            else:
-                break
+                    break
 
-        if intentos == 0:
-            logging.error("Número máximo de intentos alcanzado. Cierre del programa.")
+            if intentos == 0:
+                logging.error("Número máximo de intentos alcanzado. Cierre del programa.")
+                root.deiconify()
+                self.show_custom_error("Número máximo de intentos alcanzado. Cierre del programa.")
+                root.quit()
+
+        except Exception as e:
+            logging.error(f"Error en autenticar: {str(e)}")
+            self.show_custom_error(f"Error de autenticación: {str(e)}")
+            return False
+        
+        if self.autenticado:
             root.deiconify()
-            self.show_custom_error("Número máximo de intentos alcanzado. Cierre del programa.")
-            root.quit()
-    
     #aseguramos que la app reconoce contraseñas introducidas no hasheadas
     def verify_password(self, entered_password):
-        return entered_password == self.password_plaintext or self.hash_password(entered_password) == self.password_hash
-
-    def cambiar_contraseña(self):
-        if not self.autenticado:
-            logging.warning("No se ha autenticado. Debes autenticarte para cambiar la contraseña.")
-            self.show_custom_error("No se ha autenticado. Debes autenticarte para cambiar la contraseña.")
-            return
-        
-        # First dialog for new password
-        dialog_new = CustomPasswordDialog(self.root, "Introduce la nueva contraseña:", "Nueva Contraseña")
-        self.root.wait_window(dialog_new)
-        
-        if dialog_new.result is None:
-            logging.warning("Cambio de contraseña cancelado.")
-            return
+        if self.password_plaintext == "1234" and entered_password == "1234":
+            logging.warning("Contraseña por defecto. Por favor cambiala")
+            self.show_custom_warning("Estás usando contraseña por defecto. Por favor cambiala por razones de la seguridad.")
+        return (entered_password == self.password_plaintext or 
+                self.hash_password(entered_password) == self.password_hash)
     
-        new_password = dialog_new.result
+    def cambiar_contraseña(self):
+        try:
+            if not self.autenticado:
+                logging.warning("No se ha autenticado. Debes autenticarte para cambiar la contraseña.")
+                self.show_custom_error("No se ha autenticado. Debes autenticarte para cambiar la contraseña.")
+                return
             
-        if not self.validate_password(new_password):
-            self.show_custom_warning("La nueva contraseña no cumple los requisitos.  \nDebe tener al menos 6 caracteres y solo puede contener letras, números y los caracteres . - _")
-            return
+            # First dialog for new password
+            dialog_new = CustomPasswordDialog(self.root, "Introduce la nueva contraseña:", "Nueva Contraseña")
+            self.root.wait_window(dialog_new)
+            
+            if dialog_new.result is None:
+                logging.warning("Cambio de contraseña cancelado.")
+                return
         
-        dialog_confirm = CustomPasswordDialog(self.root, "Confirma la nueva contraseña:", "Confirmar Contraseña")
-        self.root.wait_window(dialog_confirm)
-        
-        if dialog_confirm.result is None:
-            logging.warning("Cambio de contraseña cancelado.")
-            return
-        
-        if new_password == dialog_confirm.result:
-            self.password_hash = self.hash_password(new_password)
-            self.password_plaintext = new_password
-            logging.info("Contraseña cambiada exitosamente.")
-            self.show_custom_info("Contraseña cambiada exitosamente.")
-            self.autenticado = False
-            self.autenticar(self.root)
-        else:
-            self.show_custom_error( "Las contraseñas no coinciden.")
-            logging.warning("Las contraseñas no coinciden en el cambio de contraseña.")
+            new_password = dialog_new.result
+                
+            if not self.validate_password(new_password):
+                self.show_custom_warning("La nueva contraseña no cumple los requisitos.  \nDebe tener al menos 6 caracteres y solo puede contener letras, números y los caracteres . - _")
+                return
+            
+            dialog_confirm = CustomPasswordDialog(self.root, "Confirma la nueva contraseña:", "Confirmar Contraseña")
+            self.root.wait_window(dialog_confirm)
+            
+            if dialog_confirm.result is None:
+                logging.warning("Cambio de contraseña cancelado.")
+                return
+            
+            if new_password == dialog_confirm.result:
+                self.password_hash = self.hash_password(new_password)
+                self.password_plaintext = new_password
+                self.save_password()
+                logging.info("Contraseña cambiada exitosamente.")
+                self.show_custom_info("Contraseña cambiada exitosamente.")
+                self.autenticado = False
+                self.autenticar(self.root)
+            else:
+                self.show_custom_error("Las contraseñas no coinciden.")
+                logging.warning("Las contraseñas no coinciden en el cambio de contraseña.")
+        except Exception as e:
+            logging.error(f"Error en cambiar_contraseña: {str(e)}")
+            self.show_custom_error(f"Error al cambiar la contraseña: {str(e)}")
 
     def validate_password(self, contraseña):
         if len(contraseña) < 6:
@@ -315,7 +355,7 @@ class Taximetro:
     
     def crear_tabla_registros(self):
         try:
-            self.conexion_bd = sqlite3.connect("registros.db")
+            self.conexion_bd = sqlite3.connect("taximetro.db")
             cursor = self.conexion_bd.cursor()
             cursor.execute('''
                 CREATE TABLE IF NOT EXISTS registros (
