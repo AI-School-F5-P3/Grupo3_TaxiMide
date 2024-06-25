@@ -93,6 +93,7 @@ class Taximetro:
         self.autenticado = False
         self.conexion_bd = None
         self.crear_tabla_registros()
+        self.crear_tabla_contraseñas_anteriores()
         logging.info("Taxímetro iniciado con tarifas por defecto y contraseña establecida.")
 
     def show_custom_error(self, message):
@@ -119,6 +120,7 @@ class Taximetro:
             self.resetear_valores()
             self.tiempo_ultimo_cambio = time.time()
             self.en_movimiento = False  # Ensure we start in "parado" state
+            self.actualizar_tiempo_costo()
             self.estado_label.configure(text="Taxi en parado.")
             self.boton_empezar_carrera.configure(state=tk.DISABLED)
             self.boton_marcha.configure(state=tk.NORMAL)
@@ -174,7 +176,7 @@ class Taximetro:
         self.logo_label = tk.Label(self.frame_izquierda,image=self.logo_image, bg="#3498db")
         self.logo_label.pack(pady=5)
 
-        self.boton_empezar_carrera = customtkinter.CTkButton(self.frame_izquierda, text="Empezar Carrera", hover_color="pale green", text_color="black", font=("Helvetica", 20, "bold"), command=self.empezar_carrera, width=150, height=30, fg_color="light goldenrod")
+        self.boton_empezar_carrera = customtkinter.CTkButton(self.frame_izquierda, text="Start", hover_color="pale green", text_color="black", font=("Helvetica", 20, "bold"), command=self.empezar_carrera, width=150, height=30, fg_color="light goldenrod")
         self.boton_empezar_carrera.pack(pady=5)
 
         self.boton_marcha = customtkinter.CTkButton(self.frame_izquierda, text="Marcha", hover_color="pale green", text_color="black", font=("Helvetica", 20, "bold"), command=self.iniciar_movimiento, width=150, height=30, fg_color="light goldenrod", state=tk.DISABLED)
@@ -228,6 +230,41 @@ class Taximetro:
         canvas.delete("all")  # Borramos todo lo dibujado previamente en el Canvas
         canvas.create_text(150, 30, text=texto, font=("Arial", 38), fill="white")
 
+    def crear_tabla_contraseñas_anteriores(self):
+        try:
+            cursor = self.conexion_bd.cursor()
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS contraseñas_anteriores (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    contraseña_hash TEXT NOT NULL
+                )
+            ''')
+            self.conexion_bd.commit()
+            logging.info("Tabla 'contraseñas_anteriores' creada correctamente.")
+        except sqlite3.Error as e:
+            logging.error(f"Error al crear la tabla 'contraseñas_anteriores': {e}")
+
+    def insertar_contraseña_anterior(self, contraseña_hash):
+        try:
+            cursor = self.conexion_bd.cursor()
+            cursor.execute('''
+                INSERT INTO contraseñas_anteriores (contraseña_hash) VALUES (?)
+            ''', (contraseña_hash,))
+            self.conexion_bd.commit()
+            logging.info("Contraseña anterior insertada correctamente en la base de datos.")
+        except sqlite3.Error as e:
+            logging.error(f"Error al insertar la contraseña anterior en la base de datos: {e}")
+
+    def es_contraseña_usada(self, contraseña_hash):
+        try:
+            cursor = self.conexion_bd.cursor()
+            cursor.execute('''
+                SELECT 1 FROM contraseñas_anteriores WHERE contraseña_hash = ?
+            ''', (contraseña_hash,))
+            return cursor.fetchone() is not None
+        except sqlite3.Error as e:
+            logging.error(f"Error al verificar la contraseña en la base de datos: {e}")
+            return False
 
     def autenticar(self, root):
         intentos = 3
@@ -237,7 +274,7 @@ class Taximetro:
                 dialog = CustomPasswordDialog(root, "Ingresa la contraseña para continuar:")
                 root.withdraw()  # Hide the root window again
                 root.wait_window(dialog)
-                
+
                 if dialog.result is not None:
                     if self.verify_password(dialog.result):
                         self.autenticado = True
@@ -258,23 +295,9 @@ class Taximetro:
             root.deiconify()
             self.show_custom_error("Número máximo de intentos alcanzado. Cierre del programa.")
             root.quit()
-    
-    #aseguramos que la app reconoce contraseñas introducidas no hasheadas
+
     def verify_password(self, entered_password):
         return entered_password == self.password_plaintext or self.hash_password(entered_password) == self.password_hash
-    
-    def contraseña_existe(self, password_hash):
-        try:
-            with sqlite3.connect(self.db_path) as conn:
-                cursor = conn.cursor()
-                cursor.execute('''
-                    SELECT 1 FROM contraseñas WHERE password_hash = ?
-                ''', (password_hash,))
-                return cursor.fetchone() is not None
-        except sqlite3.Error as e:
-            logging.error(f"Error al verificar la existencia de la contraseña en la tabla 'contraseñas': {e}")
-            return False
-
 
     def cambiar_contraseña(self):
         if not self.autenticado:
@@ -284,7 +307,7 @@ class Taximetro:
 
         dialog_new = CustomPasswordDialog(self.root, "Introduce la nueva contraseña:", "Nueva Contraseña")
         self.root.wait_window(dialog_new)
-    
+
         if dialog_new.result is None:
             logging.warning("Cambio de contraseña cancelado.")
             return
@@ -292,32 +315,34 @@ class Taximetro:
         new_password = dialog_new.result
 
         if not self.validate_password(new_password):
-            self.show_custom_warning("La nueva contraseña no cumple los requisitos. \nDebe tener al menos 6 caracteres y solo puede contener letras, números y los caracteres . - _")
+            self.show_custom_warning("La nueva contraseña no cumple los requisitos.  \nDebe tener al menos 6 caracteres y solo puede contener letras, números y los caracteres . - _")
             return
-
-        if self.contraseña_existe(self.hash_password(new_password)):
-            return  # Mensaje de error mostrado en contraseña_existe
 
         dialog_confirm = CustomPasswordDialog(self.root, "Confirma la nueva contraseña:", "Confirmar Contraseña")
         self.root.wait_window(dialog_confirm)
-    
+
         if dialog_confirm.result is None:
             logging.warning("Cambio de contraseña cancelado.")
             return
 
         if new_password == dialog_confirm.result:
             new_password_hash = self.hash_password(new_password)
-            if self.insertar_contraseña(new_password_hash):
-                self.password_hash = new_password_hash
-                self.password_plaintext = new_password
-                logging.info("Contraseña cambiada exitosamente.")
-                self.show_custom_info("Contraseña cambiada exitosamente.")
-                self.autenticado = False
-                self.autenticar(self.root)
+            if new_password_hash == self.password_hash:
+                self.show_custom_warning("La nueva contraseña no puede ser igual a la actual.")
+                return
+            if self.es_contraseña_usada(new_password_hash):
+                self.show_custom_warning("La nueva contraseña no puede ser igual a una contraseña anterior.")
+                return
+            self.password_hash = new_password_hash
+            self.password_plaintext = new_password
+            self.insertar_contraseña_anterior(new_password_hash)
+            logging.info("Contraseña cambiada exitosamente.")
+            self.show_custom_info("Contraseña cambiada exitosamente.")
+            self.autenticado = False
+            self.autenticar(self.root)
         else:
             self.show_custom_error("Las contraseñas no coinciden.")
             logging.warning("Las contraseñas no coinciden en el cambio de contraseña.")
-
 
     def validate_password(self, contraseña):
         if len(contraseña) < 6:
@@ -325,31 +350,26 @@ class Taximetro:
         if not re.match("^[a-zA-Z0-9._-]+$", contraseña):
             return False
         return True
-
+    
     def crear_tabla_registros(self):
         try:
-            with sqlite3.connect(self.db_path) as conn:
-                cursor = conn.cursor()
-                cursor.execute('''
-                    CREATE TABLE IF NOT EXISTS registros (
-                        id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        tiempo_inicio TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                        tiempo_fin TIMESTAMP,
-                        tiempo_parado REAL,
-                        tiempo_movimiento REAL,
-                        total_euros REAL
-                    )
-                ''')
-                cursor.execute('''
-                    CREATE TABLE IF NOT EXISTS passwords (
-                        id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        password_hash TEXT UNIQUE
-                    )
-                ''')
-                logging.info("Tablas 'registros' y 'passwords' creadas correctamente.")
+            self.conexion_bd = sqlite3.connect("registros.db")
+            cursor = self.conexion_bd.cursor()
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS registros (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    tiempo_inicio TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    tiempo_fin TIMESTAMP,
+                    tiempo_parado REAL,
+                    tiempo_movimiento REAL,
+                    total_euros REAL
+                )
+            ''')
+            self.conexion_bd.commit()
+            logging.info("Tabla 'registros' creada correctamente.")
         except sqlite3.Error as e:
-            logging.error(f"Error al crear las tablas: {e}")
-
+            logging.error(f"Error al crear la tabla 'registros': {e}")
+    
     def insertar_registro(self, tiempo_inicio, tiempo_fin, tiempo_parado, tiempo_movimiento, total_euros):
         try:
             cursor = self.conexion_bd.cursor()
