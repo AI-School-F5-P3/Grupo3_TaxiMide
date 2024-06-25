@@ -119,6 +119,7 @@ class Taximetro:
             self.resetear_valores()
             self.tiempo_ultimo_cambio = time.time()
             self.en_movimiento = False  # Ensure we start in "parado" state
+            self.actualizar_tiempo_costo()
             self.estado_label.configure(text="Taxi en parado.")
             self.boton_empezar_carrera.configure(state=tk.DISABLED)
             self.boton_marcha.configure(state=tk.NORMAL)
