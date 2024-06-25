@@ -1,5 +1,6 @@
 import hashlib 
 import re       #importamos librerias
+import os
 import time
 import logging
 import argparse
@@ -119,6 +120,7 @@ class Taximetro:
             self.resetear_valores()
             self.tiempo_ultimo_cambio = time.time()
             self.en_movimiento = False  # Ensure we start in "parado" state
+            self.actualizar_tiempo_costo()
             self.estado_label.configure(text="Taxi en parado.")
             self.boton_empezar_carrera.configure(state=tk.DISABLED)
             self.boton_marcha.configure(state=tk.NORMAL)
@@ -140,6 +142,9 @@ class Taximetro:
         self.root.title("TaxiMide")
         self.root.geometry("600x500")
         
+        script_dir = os.path.dirname(__file__)
+        logo_path = os.path.join(script_dir, "logo.png")
+
         #aquí creamos la división de los box donde irán cada elemento dentro
         self.frame_izquierda = tk.Frame(self.root, width=200,bg="dodgerblue" )
         self.frame_izquierda.pack(side=tk.LEFT, fill=tk.Y)
@@ -170,11 +175,11 @@ class Taximetro:
         self.canva_fin = customtkinter.CTkButton(self.frame_derecha, text="Fin", font=("helvetica", 24, "bold"), command=self.finalizar_carrera, width=150, height=50, hover_color="tomato", text_color="blue4", fg_color="grey60", state=tk.DISABLED)
         self.canva_fin.pack(pady=5)
         
-        self.logo_image = tk.PhotoImage(file="logo.png").subsample(3, 3)
+        self.logo_image = tk.PhotoImage(file=logo_path).subsample(3, 3)
         self.logo_label = tk.Label(self.frame_izquierda,image=self.logo_image, bg="#3498db")
         self.logo_label.pack(pady=5)
 
-        self.boton_empezar_carrera = customtkinter.CTkButton(self.frame_izquierda, text="Empezar Carrera", hover_color="pale green", text_color="black", font=("Helvetica", 20, "bold"), command=self.empezar_carrera, width=150, height=30, fg_color="light goldenrod")
+        self.boton_empezar_carrera = customtkinter.CTkButton(self.frame_izquierda, text="Start", hover_color="pale green", text_color="black", font=("Helvetica", 20, "bold"), command=self.empezar_carrera, width=150, height=30, fg_color="light goldenrod")
         self.boton_empezar_carrera.pack(pady=5)
 
         self.boton_marcha = customtkinter.CTkButton(self.frame_izquierda, text="Marcha", hover_color="pale green", text_color="black", font=("Helvetica", 20, "bold"), command=self.iniciar_movimiento, width=150, height=30, fg_color="light goldenrod", state=tk.DISABLED)
