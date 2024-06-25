@@ -14,3 +14,4 @@ CMD ["python", "taximide.py"]
 
 # recuerda: docker run -it -e DISPLAY=192.168.0.12:0 --name taximetro-container taximetro
 # en XQuarz: xhost 192.168.0.12
+# en mac: ifconfig en0: para averiguar la dirección IPv4
