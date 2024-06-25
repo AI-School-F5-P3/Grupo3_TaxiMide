@@ -118,13 +118,11 @@ La aplicación guarda un registro de cada carrera en una base de datos SQLite (`
 
 `class CustomPasswordDialog(tk.Toplevel):`
 
-`   # ... (código del diálogo de contraseña)` 
 
 #### Diálogo de Notificación
 
 `class CustomNotificationDialog(tk.Toplevel):`
 
-`   # ... (código del diálogo de notificación)` 
 
 ### Clase Taxímetro
 
@@ -134,85 +132,59 @@ La aplicación guarda un registro de cada carrera en una base de datos SQLite (`
 
 `   def __init__(self, contraseña):`
 
-`     # ... (código de inicialización)` 
 
 #### Hashing de Contraseñas
 
 `def hash_password(self, password):`
 
-`   # ... (código para hashear contraseñas)` 
 
 #### Guardar y Cargar Contraseña
 
 `def save_password(self):`
 
-`   # ... (código para guardar contraseña)`
-
-
 `def load_password(self, default_password):`
 
-`   # ... (código para cargar contraseña)`
 
 #### Autenticación
 
 `def autenticar(self, root):`
 
-`   # ... (código de autenticación)`
-
-
 `def verify_password(self, entered_password):`
 
-`   # ... (código para verificar contraseña)`
 
 #### Cambio de Contraseña
 
 `def cambiar_contraseña(self):`
 
-`   # ... (código para cambiar contraseña)` 
 
 #### Validación de Contraseña
 
 `def validate_password(self, contraseña):`
 
-`   # ... (código para validar contraseña)` 
 
 #### Configuración de Tarifas
 
 `def configurar_tarifas(self):`
 
-`   # ... (código para configurar tarifas)` 
 
 #### Gestión de Estado del Taxi
 
 `def empezar_carrera(self):`
 
-`   # ... (código para empezar carrera)`
-
-
 `def iniciar_movimiento(self):`
-
-`   # ... (código para iniciar movimiento)`
-
 
 `def detener_movimiento(self):`
 
-`   # ... (código para detener movimiento)`
-
-
 `def finalizar_carrera(self):`
 
-`   # ... (código para finalizar carrera)`
 
 #### Actualización de Tiempo y Coste
 
 `def actualizar_tiempo_costo(self):`
 
-`   # ... (código para actualizar tiempo y coste)`
-
 
 `def actualizar_canvas(self, canvas, texto):`
 
-`   # ... (código para actualizar canvas)` 
 
 ### Base de Datos
 
@@ -220,13 +192,11 @@ La aplicación guarda un registro de cada carrera en una base de datos SQLite (`
 
 `def crear_tabla_registros(self):`
 
-`   # ... (código para crear tabla de registros)` 
 
 #### Inserción de Registro
 
 `def insertar_registro(self, tiempo_inicio, tiempo_fin, tiempo_parado, tiempo_movimiento, total_euros):`
 
-`   # ... (código para insertar registro)` 
 
 ### Ejecución Principal
 
