@@ -13,6 +13,3 @@ Este taxímetro inteligente te permitirá cambiar el precio por segundo de tu vi
     - Puedes ajustar el precio de cuando estés en carrera llevando a tu cliente según consideres.
 3. **Seguridad asegurada:**
     - Para comenzar a utilizar el taxímetro y empezar la carrera del cliente, ¡deberás iniciar sesión y empezar la carrera!
-4. **Otro nivel de seguridad:**
-    - Contraseña protegida con encriptación:
-        -la contraseña del usuario está encriptada y hasheada, asegurando que tus datos están siempre protegidos.
