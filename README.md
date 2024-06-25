@@ -1,4 +1,9 @@
-# TaxiMide - Taxímetro Digital
+<div style="text-align: center;">
+  <img src="https://github.com/AI-School-F5-P3/Grupo3_taxi/assets/150898218/63b938ce-ced5-49dd-9fb3-98c3e01184b0" alt="Logotipo App Degradado Azul Verde">
+</div>
+
+# TaxiMide - Taxímetro Digital  🚕
+Este proyecto es una aplicación GUI para un taxímetro digital, desarrollada en Python utilizando las bibliotecas tkinter y customtkinter. La aplicación permite calcular las tarifas de un taxi en movimiento y en parado, gestionar contraseñas para configurar tarifas, y registrar los viajes en una base de datos SQLite
 
 ## Índice
 
