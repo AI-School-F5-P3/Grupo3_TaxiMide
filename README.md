@@ -32,6 +32,7 @@ python taximetro.py --password tu_contraseña
 ## Uso
 1. Iniciar la aplicación: Al iniciar, se solicitará la contraseña configurada para poder acceder a las funciones de la aplicación.
 2. Interfaz principal:
+  * Start: Inicia nueva carrera en el estado parado.
   * Marcha: Inicia el conteo del tiempo en movimiento.
   * Parada: Detiene el conteo del tiempo en movimiento y lo cambia a tiempo en parado.
   * Tarifas: Permite configurar nuevas tarifas para el tiempo en movimiento y en parado.
