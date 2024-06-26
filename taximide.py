@@ -179,10 +179,10 @@ class Taximetro:
         self.estado_label = tk.Label(self.frame_derecha_arriba, text="Taxi en parado.", font=("Helvetica", 20), fg="dodgerblue", bg="light goldenrod")
         self.estado_label.pack(pady=10)
 
-        self.tarifa_parado_label = tk.Label(self.frame_derecha, text=f"Tarifa en parado: {self.tarifa_parado:.2f} €/minuto", font=("Helvetica", 16), fg="deepskyblue", bg="grey24")
+        self.tarifa_parado_label = tk.Label(self.frame_derecha, text=f"Tarifa en parado: {self.tarifa_parado:.2f} €/segundo", font=("Helvetica", 16), fg="deepskyblue", bg="grey24")
         self.tarifa_parado_label.pack(pady=10)
 
-        self.tarifa_movimiento_label = tk.Label(self.frame_derecha, text=f"Tarifa en movimiento: {self.tarifa_movimiento:.2f} €/minuto", font=("Helvetica", 16), fg="deepskyblue", bg="grey24")
+        self.tarifa_movimiento_label = tk.Label(self.frame_derecha, text=f"Tarifa en movimiento: {self.tarifa_movimiento:.2f} €/segundo", font=("Helvetica", 16), fg="deepskyblue", bg="grey24")
         self.tarifa_movimiento_label.pack(pady=10)
         
         self.total_label = tk.Label(self.frame_derecha, text="Total a cobrar: 0.00 euros", font=("Helvetica", 18), fg="deepskyblue", bg="grey24")
