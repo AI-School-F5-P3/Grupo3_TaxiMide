@@ -225,6 +225,9 @@ class Taximetro:
         self.boton_quit = customtkinter.CTkButton(self.frame_izquierda, text="Exit", font=("Helvetica", 20, "bold"), command=self.root.destroy, width=150, height=30, hover_color="cyan", text_color="black", fg_color="light goldenrod")
         self.boton_quit.pack(pady=5)
 
+        self.boton_ayuda = customtkinter.CTkButton(self.frame_izquierda, text="Ayuda", font=("Helvetica", 20, "bold"), command=self.root.destroy, width=150, height=30, hover_color="cyan", text_color="black", fg_color="light goldenrod")
+        self.boton_ayuda.pack(pady=5)
+
         self.carrera_iniciada = False
         self.actualizar_canvas(self.canvas_tiempo, "00:00:00")
         self.actualizar_canvas(self.canvas_euros, "0.00 €")
@@ -356,7 +359,7 @@ class Taximetro:
             return False
         if not re.match("^[a-zA-Z0-9._-]+$", contraseña):
             return False
-        return True
+        return True            
     
     def crear_tabla_registros(self):
         try:
