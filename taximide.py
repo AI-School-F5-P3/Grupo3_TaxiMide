@@ -10,8 +10,22 @@ import customtkinter
 from tkinter import messagebox, simpledialog
 import sqlite3
 
+current_dir = os.path.dirname(os.path.abspath(__file__))
+
+# Definir la ruta de la carpeta "records" en el directorio superior
+records_dir = os.path.join(current_dir, "records")
+
+# Crear directorio "records" si no existe
+if not os.path.exists(records_dir):
+    os.makedirs(records_dir)
+
+# Definir las rutas de los archivos basadas en la carpeta "records"
+password_path = os.path.join(records_dir, "password.json")
+db_path = os.path.join(records_dir, "taximetro.db")
+log_path = os.path.join(records_dir, "taximideapp.log")
+
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', handlers=[
-    logging.FileHandler("taximideapp.log"), 
+    logging.FileHandler(log_path), 
     logging.StreamHandler()  
 ])
 
@@ -120,13 +134,13 @@ class Taximetro:
         data = {
             "password_hash": self.password_hash
         }
-        with open("password.json", "w") as f:
+        with open(password_path, "w") as f:
             json.dump(data, f)
         logging.info("Contraseña guardada")
     
     def load_password(self, default_password):
         try:
-            with open("password.json", "r") as f:
+            with open(password_path, "r") as f:
                 data = json.load(f)
             self.password_hash = data["password_hash"]
             
@@ -360,7 +374,7 @@ class Taximetro:
     
     def crear_tabla_registros(self):
         try:
-            self.conexion_bd = sqlite3.connect("taximetro.db")
+            self.conexion_bd = sqlite3.connect(db_path)
             cursor = self.conexion_bd.cursor()
             cursor.execute('''
                 CREATE TABLE IF NOT EXISTS registros (
