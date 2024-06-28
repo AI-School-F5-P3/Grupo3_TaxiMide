@@ -108,23 +108,27 @@ class Taximetro:
         self.crear_tabla_registros()
         logging.info("Taxímetro iniciado con tarifas por defecto y contraseña establecida.")
 
+    #Los proximos metodods utilizan la clase CustomNotificationDialog que definimos anteriormente.
+    #Este método muestra un diálogo de error personalizado.
     def show_custom_error(self, message):
         CustomNotificationDialog(self.root, message, "Error", "tomato")
 
+    #Para mostrar advertencias. 
     def show_custom_warning(self, message):
         CustomNotificationDialog(self.root, message, "Warning", "dark goldenrod")
 
+    #Para mostrar mensajes informativos.
     def show_custom_info(self, message):
         CustomNotificationDialog(self.root, message, "Info", "cyan")
         
-        #programamos hashing de contraseñas
+    #Este método implementa el hashing de contraseñas para mayor seguridad.
     def hash_password(self, password):
-        password_bytes = password.encode('utf-8')
-        hasher = hashlib.sha256()
-        hasher.update(password_bytes)
-        password_hash = hasher.hexdigest()
+        password_bytes = password.encode('utf-8') #Convertimos la contraseña en una secuencia de bytes utilizando la codificación UTF-8.
+        hasher = hashlib.sha256() #SHA-256 es un algoritmo de hashing que toma una entrada (bytes de contraseña) y genera una salida de tamaño fijo (un hash).
+        hasher.update(password_bytes) #Este paso es donde el algoritmo SHA-256 procesa los bytes y prepara el hash.
+        password_hash = hasher.hexdigest() #El formato hexadecimal usa caracteres del 0 al 9 y de la 'a' a la 'f' para representar la secuencia de bytes.
         
-        return password_hash
+        return password_hash #Retorna el hash de la contraseña, que es una cadena de 64 caracteres hexadecimales.
     
     def save_password(self):
         data = {
