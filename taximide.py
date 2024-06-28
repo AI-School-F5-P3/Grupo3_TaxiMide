@@ -316,22 +316,27 @@ class Taximetro:
         
         if self.autenticado:
             root.deiconify() 
-    #aseguramos que la app reconoce contraseñas introducidas no hasheadas
+   
+   #Verifica si la contraseña ingresada es correcta.
     def verify_password(self, entered_password):
+        #Comprueba si se está usando la contraseña por defecto "1234" y muestra una advertencia si es así.
         if self.password_plaintext == "1234" and entered_password == "1234":
             logging.warning("Contraseña por defecto. Por favor cambiala")
             self.show_custom_warning("Estás usando contraseña por defecto. Por favor cambiala por razones de la seguridad.")
-        return (entered_password == self.password_plaintext or 
-                self.hash_password(entered_password) == self.password_hash)
+        #Compara la contraseña ingresada con la almacenada (su hash).
+        return (entered_password == self.hash_password(entered_password) == self.password_hash)
     
+    #Permite al usuario cambiar su contraseña.
     def cambiar_contraseña(self):
         try:
+            #Verifica que el usuario esté autenticado antes de permitir el cambio.
             if not self.autenticado:
                 logging.warning("No se ha autenticado. Debes autenticarte para cambiar la contraseña.")
                 self.show_custom_error("No se ha autenticado. Debes autenticarte para cambiar la contraseña.")
                 return
             
-            # First dialog for new password
+            #Usa diálogos personalizados para pedir la nueva contraseña y su confirmación.
+            #Primer diálogo pide nueva contraseña
             dialog_new = CustomPasswordDialog(self.root, "Introduce la nueva contraseña:", "Nueva Contraseña")
             self.root.wait_window(dialog_new)
             
@@ -341,10 +346,13 @@ class Taximetro:
         
             new_password = dialog_new.result
                 
+            #llama al metodo validate_password para ver si nueva contraseña cumpla con los requisitos establecidos en el dicho método.
             if not self.validate_password(new_password):
                 self.show_custom_warning("La nueva contraseña no cumple los requisitos.  \nDebe tener al menos 6 caracteres y solo puede contener letras, números y los caracteres . - _")
+                #En caso que los requisitos no están cumplidos muestra una advertencia.
                 return
             
+            #Segundo diálogo pide confirmación de nueva contraseña
             dialog_confirm = CustomPasswordDialog(self.root, "Confirma la nueva contraseña:", "Confirmar Contraseña")
             self.root.wait_window(dialog_confirm)
             
@@ -352,6 +360,7 @@ class Taximetro:
                 logging.warning("Cambio de contraseña cancelado.")
                 return
             
+            #Actualiza y guarda la nueva contraseña si todo es correcto.
             if new_password == dialog_confirm.result:
                 self.password_hash = self.hash_password(new_password)
                 self.password_plaintext = new_password
@@ -359,6 +368,7 @@ class Taximetro:
                 logging.info("Contraseña cambiada exitosamente.")
                 self.show_custom_info("Contraseña cambiada exitosamente.")
                 self.autenticado = False
+                #Pide reauteticación con nueva contraseña.
                 self.autenticar(self.root)
             else:
                 self.show_custom_error("Las contraseñas no coinciden.")
@@ -367,10 +377,11 @@ class Taximetro:
             logging.error(f"Error en cambiar_contraseña: {str(e)}")
             self.show_custom_error(f"Error al cambiar la contraseña: {str(e)}")
 
+    #Valida que la contraseña cumpla con ciertos criterios.
     def validate_password(self, contraseña):
         if len(contraseña) < 6:
             return False
-        if not re.match("^[a-zA-Z0-9._-]+$", contraseña):
+        if not re.match("^[a-zA-Z0-9._-]+$", contraseña): #Símbolo $ marca el final de la cadena, asegurando que solo caracteres dentro de [] pueden ser utilizados.
             return False
         return True
     
@@ -499,8 +510,9 @@ class Taximetro:
         except Exception as e:
             logging.error(f"Error al cerrar la conexión a la base de datos: {e}")
 
-    
+#Esta función configura el parsing de argumentos de línea de comandos.
 def parse_args():
+    #Crea un parser de argumentos con una descripción de la aplicación.
     parser = argparse.ArgumentParser(description='TaxiMide - Aplicación GUI')
     parser.add_argument('--password', type=str, default='1234', help='Contraseña para configurar tarifas (por defecto: "1234")')
     return parser.parse_args()
@@ -508,7 +520,7 @@ def parse_args():
 if __name__ == "__main__":
     args = parse_args()
     taximetro = Taximetro(args.password)
-    root = tk.Tk()
-    root.withdraw()
-    taximetro.iniciar_carrera(root)
-    root.mainloop()
+    root = tk.Tk() #Crea la ventana principal de la aplicación Tkinter.
+    root.withdraw()#Oculta la ventana principal inicialmente.
+    taximetro.iniciar_carrera(root) #Llama al método iniciar_carrera del objeto taximetro, pasando la ventana principal como argumento.
+    root.mainloop()#Inicia el bucle principal de eventos de Tkinter. Esto mantiene la ventana abierta y responde a las interacciones del usuario.
