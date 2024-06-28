@@ -108,23 +108,27 @@ class Taximetro:
         self.crear_tabla_registros()
         logging.info("Taxímetro iniciado con tarifas por defecto y contraseña establecida.")
 
+    #Los proximos metodods utilizan la clase CustomNotificationDialog que definimos anteriormente.
+    #Este método muestra un diálogo de error personalizado.
     def show_custom_error(self, message):
         CustomNotificationDialog(self.root, message, "Error", "tomato")
 
+    #Para mostrar advertencias. 
     def show_custom_warning(self, message):
         CustomNotificationDialog(self.root, message, "Warning", "dark goldenrod")
 
+    #Para mostrar mensajes informativos.
     def show_custom_info(self, message):
         CustomNotificationDialog(self.root, message, "Info", "cyan")
         
-        #programamos hashing de contraseñas
+    #Este método implementa el hashing de contraseñas para mayor seguridad.
     def hash_password(self, password):
-        password_bytes = password.encode('utf-8')
-        hasher = hashlib.sha256()
-        hasher.update(password_bytes)
-        password_hash = hasher.hexdigest()
+        password_bytes = password.encode('utf-8') #Convertimos la contraseña en una secuencia de bytes utilizando la codificación UTF-8.
+        hasher = hashlib.sha256() #SHA-256 es un algoritmo de hashing que toma una entrada (bytes de contraseña) y genera una salida de tamaño fijo (un hash).
+        hasher.update(password_bytes) #Este paso es donde el algoritmo SHA-256 procesa los bytes y prepara el hash.
+        password_hash = hasher.hexdigest() #El formato hexadecimal usa caracteres del 0 al 9 y de la 'a' a la 'f' para representar la secuencia de bytes.
         
-        return password_hash
+        return password_hash #Retorna el hash de la contraseña, que es una cadena de 64 caracteres hexadecimales.
     
     def save_password(self):
         data = {
@@ -424,28 +428,29 @@ class Taximetro:
         else:
             self.tiempo_parado += tiempo_transcurrido
 #Para deteterminar el tiempo transcurrido entre los cambios de estado(parado y moviemto)
-#Si el taxi está en moviemiento, el tiempo será= el tiempo que ha transcurrido desde que cambiamos al estado de marcha
-#Si el taxi está en parado, el tiempo será= el tiempo que ha transcurrido desde que cambiamos al estado de parada
+#Si el taxi está en moviemiento, el tiempo será += el tiempo que ha transcurrido desde que cambiamos al estado de marcha
+#Si el taxi está en parado, el tiempo será += el tiempo que ha transcurrido desde que cambiamos al estado de parada
         self.en_movimiento = en_movimiento
         self.tiempo_ultimo_cambio = tiempo_actual
+#????????
         estado = "movimiento" if en_movimiento else "parado"
         self.estado_label.configure(text=f"Taxi en {estado}.")
-   
+#Para actualizar la interfaz grafica si está en movimiento o en parado el taxi   
         if en_movimiento:
             self.boton_marcha.configure(state=tk.DISABLED)
             self.boton_parada.configure(state=tk.NORMAL)
         else:
             self.boton_marcha.configure(state=tk.NORMAL)
             self.boton_parada.configure(state=tk.DISABLED)
-    
+#Dependiendo del nuevo estado (en_movimiento), habilita o deshabilita los botones correspondientes en la interfaz gráfica.    
         logging.info(f"Taxi en {estado}.")
-    
+#Registra el nuevo estado en el log.   
     def iniciar_movimiento(self):
         self._cambiar_estado(time.time(), True)
-    
+#Para definir el método del inicio de movimiento, llama al método cambiar_estado para índicar que está en movimiento y le pasa función time para que le devuelva el tiempo en segundos   
     def detener_movimiento(self):
         self._cambiar_estado(time.time(), False)
-       
+#Para definir el método del inicio de movimiento, llama al método cambiar_estado para índicar que está en movimiento y le pasa función time para que le devuelva el tiempo en segundos      
 
     def finalizar_carrera(self):
         tiempo_actual = time.time()
@@ -482,7 +487,7 @@ class Taximetro:
         self.carrera_iniciada = False
         self.actualizar_canvas(self.canvas_tiempo, "00:00:00")
         self.actualizar_canvas(self.canvas_euros, "0.00 €")
-        
+#Para resetear todos los valores a cero en el momento de que se inicie una nueva carrera        
     def __del__(self):
         try:
             if self.conexion_bd:
