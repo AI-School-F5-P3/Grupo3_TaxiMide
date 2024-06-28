@@ -16,7 +16,9 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
     logging.FileHandler("taximideapp.log"), 
     logging.StreamHandler()  
 ])
-
+ 
+  #Crea un diálogo personalizado para la entrada de contraseñas. Hereda de tk.Toplevel (una clase de Tkinter que crea una nueva ventana de nivel superior.)
+  #Inicializa la ventana con un título, un mensaje y un campo de entrada para la contraseña.
 class CustomPasswordDialog(tk.Toplevel):
     def __init__(self, parent, message, title="Autenticación"):
         super().__init__(parent)
@@ -29,6 +31,7 @@ class CustomPasswordDialog(tk.Toplevel):
         self.label = tk.Label(self.body_frame, text=message, font=("Helvetica", 16), bg="dodgerblue", fg="black")
         self.label.pack(pady=(0, 10))
 
+        #Crea un campo de entrada (Entry) que muestra asteriscos en lugar de los caracteres introducidos.
         self.entry = tk.Entry(self.body_frame, show="*", font=("Helvetica", 12), bg="lightgrey", fg="black")
         self.entry.pack(pady=(10, 10))
         self.entry.focus_set()
@@ -39,12 +42,14 @@ class CustomPasswordDialog(tk.Toplevel):
         self.cancel_button = customtkinter.CTkButton(self.body_frame, text="Cancel", command=self.cancel, font=("Helvetica", 20), hover_color="pale green", text_color="black",  fg_color="light goldenrod", width=100, height=30)
         self.cancel_button.pack(side=tk.RIGHT, padx=50)
         
+        #Configura el diálogo para que esté siempre en la parte superior y tenga un tamaño fijo.
         self.protocol("WM_DELETE_WINDOW", self.cancel)
-        self.grab_set()
+        self.grab_set() #bloquea la interacción con otras ventanas de la aplicación hasta que se cierre
         self.geometry("500x200")
         self.attributes('-topmost', True)
         self.result = None
 
+        #Vincula las teclas Enter y Escape a las funciones ok() y cancel() respectivamente.
         self.bind("<Return>", lambda event: self.ok())
         self.bind("<Escape>", lambda event: self.cancel())
         
@@ -56,6 +61,8 @@ class CustomPasswordDialog(tk.Toplevel):
         self.result = None
         self.parent.destroy()
 
+#Crea un diálogo personalizado para mostrar notificaciones.
+#Toma un mensaje, un título y un color como parámetros.
 class CustomNotificationDialog(tk.Toplevel):
     def __init__(self, parent, message, title, color):
         super().__init__(parent)
@@ -71,12 +78,13 @@ class CustomNotificationDialog(tk.Toplevel):
         self.ok_button = customtkinter.CTkButton(self.body_frame, text="OK", command=self.destroy, font=("Helvetica", 20), hover_color="pale green", text_color="black",  fg_color="light goldenrod", width=100, height=30)
         self.ok_button.pack(pady=5)
         
-
+        #Configura el diálogo para que esté siempre en la parte superior y tenga un tamaño fijo.
         self.protocol("WM_DELETE_WINDOW", self.destroy)
-        self.grab_set()
+        self.grab_set() #bloquea la interacción con otras ventanas de la aplicación hasta que se cierre
         self.geometry("500x250")
         self.attributes('-topmost', True)
 
+        #Vincula la tecla Enter a la funcion ok()
         self.bind("<Return>", lambda event: self.destroy())
 
 
