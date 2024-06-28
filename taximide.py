@@ -275,15 +275,17 @@ class Taximetro:
         canvas.delete("all")  # Borramos todo lo dibujado previamente en el Canvas
         canvas.create_text(150, 30, text=texto, font=("Arial", 38), fill="white")
 
-
+    #Esta función maneja el proceso de autenticación del usuario.
     def autenticar(self, root):
         try:
+            #Permite hasta 3 intentos de ingreso de contraseña.
             intentos = 3
             while intentos > 0:
                 if not self.autenticado:
-                    root.deiconify()  # Show the root window
+                    root.deiconify()  # Muestra root window
+                    #Usa un diálogo personalizado (CustomPasswordDialog) para pedir la contraseña.
                     dialog = CustomPasswordDialog(root, "Ingresa la contraseña para continuar:")
-                    root.withdraw()  # Hide the root window again
+                    root.withdraw()  # Esconde root window otra vez
                     root.wait_window(dialog)
                     
                     if dialog.result is not None:
@@ -313,7 +315,7 @@ class Taximetro:
             return False
         
         if self.autenticado:
-            root.deiconify()
+            root.deiconify() 
     #aseguramos que la app reconoce contraseñas introducidas no hasheadas
     def verify_password(self, entered_password):
         if self.password_plaintext == "1234" and entered_password == "1234":
