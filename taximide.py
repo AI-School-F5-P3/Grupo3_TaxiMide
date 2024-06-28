@@ -130,14 +130,18 @@ class Taximetro:
         
         return password_hash #Retorna el hash de la contraseña, que es una cadena de 64 caracteres hexadecimales.
     
+    #Este método guarda el hash de la contraseña en un archivo JSON.
     def save_password(self):
+        #Crea un diccionario data con una clave "password_hash" y el valor del hash de la contraseña.
         data = {
             "password_hash": self.password_hash
         }
         with open("password.json", "w") as f:
             json.dump(data, f)
         logging.info("Contraseña guardada")
+        #Registra en el log que la contraseña ha sido guardada.
     
+    #Este método intenta cargar el hash de la contraseña desde el archivo JSON.
     def load_password(self, default_password):
         try:
             with open("password.json", "r") as f:
@@ -146,6 +150,7 @@ class Taximetro:
             
             logging.info("Contraseña cargada")
 
+        #Si el archivo no existe crea un nuevo hash usando la contraseña por defecto proporcionada y llama a save_password() para guardar el nuevo hash.
         except FileNotFoundError:
             self.password_hash = self.hash_password(default_password)
             self.password_plaintext = default_password
