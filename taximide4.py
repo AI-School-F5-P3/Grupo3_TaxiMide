@@ -10,9 +10,10 @@ import customtkinter
 from tkinter import messagebox, simpledialog
 import sqlite3
 
+# Obtener el directorio actual del script en ejecución y asignarlo a la variable current_dir
 current_dir = os.path.dirname(os.path.abspath(__file__))
 
-# Definir la ruta de la carpeta "records" en el directorio superior
+# Definir la ruta de la carpeta "records" en el directorio superior y asignarlo a la variable records_dir
 records_dir = os.path.join(current_dir, "records")
 
 # Crear directorio "records" si no existe
