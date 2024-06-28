@@ -328,7 +328,8 @@ class Taximetro:
             logging.warning("Contraseña por defecto. Por favor cambiala")
             self.show_custom_warning("Estás usando contraseña por defecto. Por favor cambiala por razones de la seguridad.")
         #Compara la contraseña ingresada con la almacenada (su hash).
-        return (entered_password == self.hash_password(entered_password) == self.password_hash)
+        return (entered_password == self.password_plaintext or 
+                self.hash_password(entered_password) == self.password_hash)
     
     #Permite al usuario cambiar su contraseña.
     def cambiar_contraseña(self):
