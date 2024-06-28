@@ -415,19 +415,22 @@ class Taximetro:
             messagebox.showerror("Error", "Introduce valores numéricos válidos.")
 
 
-        
+#'_cambiar_estado' para indicar que es un método privado      
     def _cambiar_estado(self, tiempo_actual, en_movimiento):
         tiempo_transcurrido = tiempo_actual - self.tiempo_ultimo_cambio
+#Calcula el tiempo transcurrido desde el último cambio de estado.
         if self.en_movimiento:
             self.tiempo_movimiento += tiempo_transcurrido
         else:
             self.tiempo_parado += tiempo_transcurrido
-
+#Para deteterminar el tiempo transcurrido entre los cambios de estado(parado y moviemto)
+#Si el taxi está en moviemiento, el tiempo será= el tiempo que ha transcurrido desde que cambiamos al estado de marcha
+#Si el taxi está en parado, el tiempo será= el tiempo que ha transcurrido desde que cambiamos al estado de parada
         self.en_movimiento = en_movimiento
         self.tiempo_ultimo_cambio = tiempo_actual
         estado = "movimiento" if en_movimiento else "parado"
         self.estado_label.configure(text=f"Taxi en {estado}.")
-    
+   
         if en_movimiento:
             self.boton_marcha.configure(state=tk.DISABLED)
             self.boton_parada.configure(state=tk.NORMAL)
