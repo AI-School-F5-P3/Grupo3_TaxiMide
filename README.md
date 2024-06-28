@@ -1,5 +1,6 @@
 <div style="text-align: center;">
-  <img src="https://github.com/AI-School-F5-P3/Grupo3_taxi/assets/150898218/63b938ce-ced5-49dd-9fb3-98c3e01184b0" alt="Logotipo App Degradado Azul Verde">
+<img width="776" alt="taximide_horizontal_logo" src="https://github.com/AI-School-F5-P3/Grupo3_TaxiMide/assets/18529354/bc132496-5925-4173-9960-47712b642a14">
+
 </div>
 
 # TaxiMide - Taxímetro Digital  🚕
