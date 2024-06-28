@@ -523,8 +523,8 @@ def parse_args():
 
 if __name__ == "__main__":
     args = parse_args()
-    root = tk.Tk()
-    root.withdraw()
+    root = tk.Tk() #Crea la ventana principal de la aplicación Tkinter.
+    root.withdraw() #Oculta la ventana principal inicialmente.
     taximetro = Taximetro(args.password, root)
     taximetro.iniciar_carrera(root)
-    root.mainloop()
+    root.mainloop() #Inicia el bucle principal de eventos de Tkinter. Esto mantiene la ventana abierta y responde a las interacciones del usuario.
