@@ -477,7 +477,7 @@ class Taximetro:
     def finalizar_carrera(self):
         tiempo_actual = time.time()
         self._cambiar_estado(tiempo_actual, self.en_movimiento)
-        self.total_euros = (self.tiempo_movimiento * self.tarifa_movimiento) + (self.tiempo_parado * self.tarifa_parado)
+        self.total_euros = (self.tiempo_movimiento * self.tarifa_movimiento) + (self.tiempo_parado * self.tarifa_parado) 
         self.total_label.config(text=f"Total a cobrar: {self.total_euros:.2f} euros")
         messagebox.showinfo("Carrera finalizada", f"Total a cobrar: {self.total_euros:.2f} euros")
         self.insertar_registro(
@@ -490,7 +490,7 @@ class Taximetro:
 
         self.resetear_valores()
         self.preguntar_nueva_carrera()
-    
+#Para indicar que la carrera ha finalizado, calcular el total a cobrar, mostrarlo en la interfaz grafica, crear un registro de la carrera y resetear todos los valores    
     def preguntar_nueva_carrera(self):
         nueva_carrera = messagebox.askyesno("Nueva carrera", "¿Deseas iniciar una nueva carrera?")
         if nueva_carrera:
