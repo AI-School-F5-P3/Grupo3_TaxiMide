@@ -1,31 +1,19 @@
-import hashlib 
-import re    
-import os
-import json   #importamos librerias
-import time
-import logging
-import argparse
-import tkinter as tk
-import customtkinter
-from tkinter import messagebox, simpledialog
-import sqlite3
-
-current_dir = os.path.dirname(os.path.abspath(__file__))
-
-# Definir la ruta de la carpeta "records" en el directorio superior
-records_dir = os.path.join(current_dir, "records")
-
-# Crear directorio "records" si no existe
-if not os.path.exists(records_dir):
-    os.makedirs(records_dir)
-
-# Definir las rutas de los archivos basadas en la carpeta "records"
-password_path = os.path.join(records_dir, "password.json")
-db_path = os.path.join(records_dir, "taximetro.db")
-log_path = os.path.join(records_dir, "taximideapp.log")
+import hashlib #Se usa para generar hashes de contraseñas, proporcionando seguridad en el almacenamiento de las mismas.
+import re   #Permite el uso de expresiones regulares, aquí usamos para validar formatos de contraseñas.
+import os  #Proporciona funciones para interactuar con el sistema operativo, como manejar rutas de archivos. Aquí usamos para el logo.
+import json   #Se utiliza para leer y escribir datos en formato JSON, aquí guardamos contraseñas hasheadas
+import time #Permite trabajar con timestamps y realizar mediciones de tiempo, crucial para el funcionamiento del taxímetro.
+import logging #Se usa para registrar eventos y errores de la aplicación en un archivo de log.
+import argparse #Facilita el parsing de argumentos de línea de comandos.(CLI)
+import tkinter as tk #Es la biblioteca principal para crear la interfaz gráfica de usuario (GUI).
+import customtkinter #Una extensión de tkinter que proporciona widgets personalizados y modernos.
+from tkinter import messagebox, simpledialog 
+#messagebox:Proporciona cuadros de diálogo para mostrar mensajes al usuario.
+#simpledialog: Ofrece diálogos simples para entrada de datos.
+import sqlite3 # Permite interactuar con bases de datos SQLite para almacenar registros de carreras.
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', handlers=[
-    logging.FileHandler(log_path), 
+    logging.FileHandler("taximideapp.log"), 
     logging.StreamHandler()  
 ])
 
@@ -134,13 +122,13 @@ class Taximetro:
         data = {
             "password_hash": self.password_hash
         }
-        with open(password_path, "w") as f:
+        with open("password.json", "w") as f:
             json.dump(data, f)
         logging.info("Contraseña guardada")
     
     def load_password(self, default_password):
         try:
-            with open(password_path, "r") as f:
+            with open("password.json", "r") as f:
                 data = json.load(f)
             self.password_hash = data["password_hash"]
             
@@ -193,10 +181,10 @@ class Taximetro:
         self.estado_label = tk.Label(self.frame_derecha_arriba, text="Taxi en parado.", font=("Helvetica", 20), fg="dodgerblue", bg="light goldenrod")
         self.estado_label.pack(pady=10)
 
-        self.tarifa_parado_label = tk.Label(self.frame_derecha, text=f"Tarifa en parado: {self.tarifa_parado:.2f} €/segundo", font=("Helvetica", 16), fg="deepskyblue", bg="grey24")
+        self.tarifa_parado_label = tk.Label(self.frame_derecha, text=f"Tarifa en parado: {self.tarifa_parado:.2f} €/minuto", font=("Helvetica", 16), fg="deepskyblue", bg="grey24")
         self.tarifa_parado_label.pack(pady=10)
 
-        self.tarifa_movimiento_label = tk.Label(self.frame_derecha, text=f"Tarifa en movimiento: {self.tarifa_movimiento:.2f} €/segundo", font=("Helvetica", 16), fg="deepskyblue", bg="grey24")
+        self.tarifa_movimiento_label = tk.Label(self.frame_derecha, text=f"Tarifa en movimiento: {self.tarifa_movimiento:.2f} €/minuto", font=("Helvetica", 16), fg="deepskyblue", bg="grey24")
         self.tarifa_movimiento_label.pack(pady=10)
         
         self.total_label = tk.Label(self.frame_derecha, text="Total a cobrar: 0.00 euros", font=("Helvetica", 18), fg="deepskyblue", bg="grey24")
@@ -212,12 +200,7 @@ class Taximetro:
         self.canva_fin = customtkinter.CTkButton(self.frame_derecha, text="Fin", font=("helvetica", 24, "bold"), command=self.finalizar_carrera, width=150, height=50, hover_color="tomato", text_color="blue4", fg_color="grey60", state=tk.DISABLED)
         self.canva_fin.pack(pady=5)
         
-        try:
-            self.logo_image = tk.PhotoImage(file=logo_path).subsample(3, 3)
-        except tk.TclError as e:
-            print(f"Error al cargar logo.png: {e}")
-            # Puedes asignar un valor predeterminado o manejar la situación de otra manera
-            self.logo_image = None  # Asignar None u otra imagen predeterminada
+        self.logo_image = tk.PhotoImage(file=logo_path).subsample(3, 3)
         self.logo_label = tk.Label(self.frame_izquierda,image=self.logo_image, bg="#3498db")
         self.logo_label.pack(pady=5)
 
@@ -374,7 +357,7 @@ class Taximetro:
     
     def crear_tabla_registros(self):
         try:
-            self.conexion_bd = sqlite3.connect(db_path)
+            self.conexion_bd = sqlite3.connect("taximetro.db")
             cursor = self.conexion_bd.cursor()
             cursor.execute('''
                 CREATE TABLE IF NOT EXISTS registros (
