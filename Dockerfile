@@ -19,3 +19,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 CMD ["python", "taximide.py"]
+
+# Para que funcione en MacOs: 
+    # 1. Averiguar dirección IPv4 (ifconfig en0)
+    # 2. Instalar XQuarz y configurar: xhost 192.XXXXXX (dirección IPv4)
+    # 3. Ejecutar: docker run -it -e DISPLAY=192.XXXXX:0 --name taximetro-container taximetro (siendo "taximetro-container" el nombre del contenedor y "taximetro" el nombre de la imagen)
