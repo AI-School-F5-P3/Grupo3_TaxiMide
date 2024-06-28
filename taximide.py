@@ -453,10 +453,10 @@ class Taximetro:
         if not re.match("^[a-zA-Z0-9._-]+$", contraseña): #Símbolo $ marca el final de la cadena, asegurando que solo caracteres dentro de [] pueden ser utilizados.
             return False
         return True
-    
-    def crear_tabla_registros(self):
-        try:
-            self.conexion_bd = sqlite3.connect(db_path)
+    #Se define el método para crear una tabla de registros
+    def crear_tabla_registros(self): #se establece un bloque try para manejar a través de excepciones posibles errores que puedan surgir.
+        try: # Se establece una conexión con .connect a la librería sqlite3, el enrutamiento se establece a la base de datos taximetro.db declarado en el atributo en la lin 93
+            self.conexion_bd = sqlite3.connect(db_path) # Se declará el cursor, realiza un seguimiento de la posición en el conjunto de resultados y permite realizar varias operaciones fila por fila en un conjunto de resultados, con o sin retorno a la tabla original. Es decir, los cursores devuelven conceptualmente un conjunto de resultados basado en las tablas de las bases de datos.
             cursor = self.conexion_bd.cursor()
             cursor.execute('''
                 CREATE TABLE IF NOT EXISTS registros (
@@ -467,19 +467,22 @@ class Taximetro:
                     tiempo_movimiento REAL,
                     total_euros REAL
                 )
-            ''')
-            self.conexion_bd.commit()
+            ''') # se aplica el metodo execute al cursor par ejecutar la creación de una tabla, también triple comilla apra declarar la tabla en varias lineas
+            # Usamos los comandos CREATE TABLE e IF NOT EXISTS para crear la tabla, "solo si no existe, es decir, sino ha sido creada ya, de esta manera, al volver a dar RUN al archivo no dará error, por la existencia de una tabla con ese nombre.
+	# se debe a proceder a declarar el nombre de las columnas asi como el tipo de dato que se almacenará/consultará en las mismas.
+            self.conexion_bd.commit() # como se van a insertar datos es obligatorio hacer un commit al método, en otro tipo de comandos como SELECT para hacer lectura, los commit no son necesarios ya que no se estan modificando, añadiendo o borrando datos
             logging.info("Tabla 'registros' creada correctamente.")
         except sqlite3.Error as e:
             logging.error(f"Error al crear la tabla 'registros': {e}")
     
-    def insertar_registro(self, tiempo_inicio, tiempo_fin, tiempo_parado, tiempo_movimiento, total_euros):
+    def insertar_registro(self, tiempo_inicio, tiempo_fin, tiempo_parado, tiempo_movimiento, total_euros): # método para incluir varios filas de manera simultanea.
         try:
-            cursor = self.conexion_bd.cursor()
+            cursor = self.conexion_bd.cursor() # siempre se debe establecer el cursor para que el query pueda movilizarse entre las filas y columnas
             cursor.execute('''
                 INSERT INTO registros (tiempo_inicio, tiempo_fin, tiempo_parado, tiempo_movimiento, total_euros)
                 VALUES (?, ?, ?, ?, ?)
-            ''', (tiempo_inicio, tiempo_fin, tiempo_parado, tiempo_movimiento, total_euros))
+            ''', (tiempo_inicio, tiempo_fin, tiempo_parado, tiempo_movimiento, total_euros)) # tras el execute se declaran las columnas en las cuales se ingresarán los datos y su orden, luego para ingresar varios tipos de datos a la vez, se sustituirán los datos ingresados por la cantidad de interrogantes
+            self.conexion_bd.commit() # nuevamente se hace un commit porque como se van a añadir datos, se tiene que guardan los datos tras ser agregados.
             self.conexion_bd.commit()
             logging.info("Registro insertado correctamente en la tabla 'registros'.")
         except sqlite3.Error as e:
