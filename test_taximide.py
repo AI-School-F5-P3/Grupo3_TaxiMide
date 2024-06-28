@@ -2,7 +2,7 @@ import unittest
 import tkinter as tk
 from unittest.mock import patch
 import os
-from taximide import Taximetro  # Ajusta el nombre del módulo si es diferente
+from taximide4 import Taximetro  # Ajusta el nombre del módulo si es diferente
 
 class TestTaximetro(unittest.TestCase):
 
