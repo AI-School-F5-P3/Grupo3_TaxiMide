@@ -94,7 +94,7 @@ class CustomNotificationDialog(tk.Toplevel):
 
 
 class Taximetro:
-    def __init__(self, contraseña):
+    def __init__(self, contraseña, root):
         self.db_path = 'taximetro.db'
         self.tarifa_parado = 0.02
         self.tarifa_movimiento = 0.05
@@ -109,9 +109,22 @@ class Taximetro:
         self.password_plaintext = contraseña
         self.autenticado = False
         self.conexion_bd = None
+        self.root = root
+        self.estado_label = tk.Label(root, text="Taxi en movimiento")
+        self.boton_marcha = tk.Button(root, text="Iniciar Marcha", command=self.iniciar_movimiento)
+        self.boton_parada = tk.Button(root, text="Detener Marcha", command=self.detener_movimiento)
         self.load_password(contraseña)
         self.crear_tabla_registros()
         logging.info("Taxímetro iniciado con tarifas por defecto y contraseña establecida.")
+
+    def cargar_logo(self, logo_path):
+        try:
+            self.logo_image = tk.PhotoImage(file=logo_path).subsample(3, 3)
+            logging.info(f"Logo cargado correctamente desde {logo_path}")
+        except tk.TclError as e:
+            logging.error(f"Error al cargar {logo_path}: {e}")
+            self.logo_image = None  # Opcional: Asignar None o una imagen predeterminada
+            raise  # Re-lanzamos la excepción para manejarla en otro lugar si es necesario
 
     def show_custom_error(self, message):
         CustomNotificationDialog(self.root, message, "Error", "tomato")
@@ -214,9 +227,10 @@ class Taximetro:
         self.canva_fin.pack(pady=5)
         
         try:
-            self.logo_image = tk.PhotoImage(file=logo_path).subsample(3, 3)
-        except tk.TclError as e:
-            print(f"Error al cargar logo.png: {e}")
+            self.cargar_logo(logo_path)
+        except Exception as e:
+            # Manejar el error según sea necesario
+            print(f"Error al cargar el logo: {e}")
             # Puedes asignar un valor predeterminado o manejar la situación de otra manera
             self.logo_image = None  # Asignar None u otra imagen predeterminada
         self.logo_label = tk.Label(self.frame_izquierda,image=self.logo_image, bg="#3498db")
@@ -315,6 +329,9 @@ class Taximetro:
         
         if self.autenticado:
             root.deiconify()
+            
+        return self.autenticado  # Devuelve self.autenticado al final del método
+                
     #aseguramos que la app reconoce contraseñas introducidas no hasheadas
     def verify_password(self, entered_password):
         if self.password_plaintext == "1234" and entered_password == "1234":
@@ -506,8 +523,8 @@ def parse_args():
 
 if __name__ == "__main__":
     args = parse_args()
-    taximetro = Taximetro(args.password)
     root = tk.Tk()
     root.withdraw()
+    taximetro = Taximetro(args.password, root)
     taximetro.iniciar_carrera(root)
     root.mainloop()
