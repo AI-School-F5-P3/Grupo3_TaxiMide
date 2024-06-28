@@ -162,11 +162,11 @@ class Taximetro:
             self.carrera_iniciada = False
             self.resetear_valores()
             self.tiempo_ultimo_cambio = time.time()
-            self.en_movimiento = False  # Ensure we start in "parado" state
+            self.en_movimiento = False  #La app emieza en estado "parado"
             self.estado_label.configure(text="Taxi en parado.")
             self.boton_empezar_carrera.configure(state=tk.DISABLED)
             self.boton_marcha.configure(state=tk.NORMAL)
-            self.boton_parada.configure(state=tk.DISABLED)  # Disable "Parada" button initially
+            self.boton_parada.configure(state=tk.DISABLED)  # Disable boton "Parada" inicialmente
             self.canva_fin.configure(state=tk.NORMAL)
             logging.info("Carrera iniciada. Taxi en parado.")
             self.actualizar_tiempo_costo()
@@ -174,7 +174,7 @@ class Taximetro:
 
     def iniciar_carrera(self, root):
         self.root = root
-        self.root.withdraw()  # Hide the main window initially
+        self.root.withdraw()  #Esconde main window inicialmente
         self.autenticar(root)
         if not self.autenticado:
             root.quit()
@@ -486,10 +486,10 @@ class Taximetro:
     def preguntar_nueva_carrera(self):
         nueva_carrera = messagebox.askyesno("Nueva carrera", "¿Deseas iniciar una nueva carrera?")
         if nueva_carrera:
-            self.en_movimiento = False
+            self.en_movimiento = False #Aseguramos que la nueva carrera empieza en estado "parado"
             self.empezar_carrera()
         else:
-            self.root.destroy()
+            self.root.destroy() #Cierre de la app 
     
     def resetear_valores(self):
         self.tiempo_total = 0
