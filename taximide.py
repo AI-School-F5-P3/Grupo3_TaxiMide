@@ -30,7 +30,13 @@ log_path = os.path.join(records_dir, "taximideapp.log")
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', handlers=[
     logging.FileHandler(log_path), 
     logging.StreamHandler()  
-])
+]) # Este método acepta los siguientes parámetros: 
+
+# level=logging.INFO: Establece el nivel de registro a INFO. Esto significa que solo se registrarán mensajes que tengan un nivel igual o superior a INFO. Otros niveles incluyen DEBUG, WARNING, ERROR, y CRITICAL. 
+
+# format='%(asctime)s - %(levelname)s - %(message)s': Define el formato en el que se mostrarán los mensajes de registro. En este caso: 1. %(asctime)s: Inserta la fecha y hora en la que se registró el mensaje. 2. %(levelname)s: Inserta el nivel de registro del mensaje (por ejemplo, INFO, ERROR).  %(message)s: Inserta el contenido del mensaje en sí.
+
+# handlers=[logging.FileHandler(log_path), logging.StreamHandler()]: Especifica los handlers (manejadores) de registro que se utilizarán para manejar los mensajes de registro: 1. logging.FileHandler(log_path): Crea un handler que escribe los mensajes de registro en un archivo. El parámetro log_path debe contener la ruta al archivo donde se guardarán los registros.  2. logging.StreamHandler(): Crea un handler que envía los mensajes de registro a la salida estándar (en la mayoría de los casos, a la consola).
  
  
 class CustomPasswordDialog(tk.Toplevel):
@@ -127,7 +133,6 @@ class Taximetro:
         self.conexion_bd = None
         self.root = root
         self.estado_label = tk.Label(root, text="Taxi en movimiento")
-        self.estado_label = tk.Label(root, text="Taxi en movimiento")
         self.boton_marcha = tk.Button(root, text="Iniciar Marcha", command=self.iniciar_movimiento)
         self.boton_parada = tk.Button(root, text="Detener Marcha", command=self.detener_movimiento)
         self.load_password(contraseña)
@@ -135,19 +140,9 @@ class Taximetro:
         logging.info("Taxímetro iniciado con tarifas por defecto y contraseña establecida.")
 
 
-    def cargar_logo(self, logo_path):
-        try:
-            self.logo_image = tk.PhotoImage(file=logo_path).subsample(3, 3)
-            logging.info(f"Logo cargado correctamente desde {logo_path}")
-        except tk.TclError as e:
-            logging.error(f"Error al cargar {logo_path}: {e}")
-            self.logo_image = None  # Opcional: Asignar None o una imagen predeterminada
-            raise  # Re-lanzamos la excepción para manejarla en otro lugar si es necesario
-
-
     def show_custom_error(self, message):
         '''
-        Los proximos metodods utilizan la clase CustomNotificationDialog que definimos anteriormente.
+        Los proximos metodos utilizan la clase CustomNotificationDialog que definimos anteriormente.
         Este método muestra un diálogo de error personalizado.
         '''
         CustomNotificationDialog(self.root, message, "Error", "tomato")
@@ -217,7 +212,7 @@ class Taximetro:
             self.carrera_iniciada = False
             self.resetear_valores()
             self.tiempo_ultimo_cambio = time.time()
-            self.en_movimiento = False  #La app emieza en estado "parado"
+            self.en_movimiento = False  #La app empieza en estado "parado"
             self.estado_label.configure(text="Taxi en parado.")
             self.boton_empezar_carrera.configure(state=tk.DISABLED)
             self.boton_marcha.configure(state=tk.NORMAL)
@@ -298,10 +293,6 @@ class Taximetro:
         self.boton_quit = customtkinter.CTkButton(self.frame_izquierda, text="Exit", font=("Helvetica", 20, "bold"), command=self.root.destroy, width=150, height=30, hover_color="cyan", text_color="black", fg_color="light goldenrod")
         self.boton_quit.pack(pady=5)
 
-        self.carrera_iniciada = False
-        self.actualizar_canvas(self.canvas_tiempo, "00:00:00")
-        self.actualizar_canvas(self.canvas_euros, "0.00 €")
-        
         self.carrera_iniciada = False
         self.actualizar_canvas(self.canvas_tiempo, "00:00:00")
         self.actualizar_canvas(self.canvas_euros, "0.00 €")
@@ -496,13 +487,13 @@ class Taximetro:
             return
 
         try:
-            nueva_tarifa_parado = float(simpledialog.askstring("Configurar tarifas", "Introduce la nueva tarifa en parado (€/minuto):"))
-            nueva_tarifa_movimiento = float(simpledialog.askstring("Configurar tarifas", "Introduce la nueva tarifa en movimiento (€/minuto):"))
+            nueva_tarifa_parado = float(simpledialog.askstring("Configurar tarifas", "Introduce la nueva tarifa en parado (€/segundo):"))
+            nueva_tarifa_movimiento = float(simpledialog.askstring("Configurar tarifas", "Introduce la nueva tarifa en movimiento (€/segundo):"))
             self.tarifa_parado = nueva_tarifa_parado
             self.tarifa_movimiento = nueva_tarifa_movimiento
             logging.info("Tarifas actualizadas en parado: %.2f, y en movimiento: %.2f", self.tarifa_parado, self.tarifa_movimiento)
-            self.tarifa_parado_label.configure(text=f"Tarifa en parado: {self.tarifa_parado:.2f} €/minuto")
-            self.tarifa_movimiento_label.configure(text=f"Tarifa en movimiento: {self.tarifa_movimiento:.2f} €/minuto")
+            self.tarifa_parado_label.configure(text=f"Tarifa en parado: {self.tarifa_parado:.2f} €/segundo")
+            self.tarifa_movimiento_label.configure(text=f"Tarifa en movimiento: {self.tarifa_movimiento:.2f} €/segundo")
             messagebox.showinfo("Éxito", "Tarifas actualizadas.")
         except ValueError:
             logging.error("Error al introducir tarifas. Valores no numéricos.")
