@@ -1,7 +1,7 @@
 import unittest  # Importar el módulo de unittest para escribir pruebas unitarias
 import tkinter as tk  # Importar tkinter para simular interfaces gráficas de usuario
 from unittest.mock import patch  # Importar patch de unittest.mock para realizar mock de funciones
-from taximide5 import Taximetro  # Importar la clase Taximetro que se va a probar (ajustar nombre si es diferente)
+from taximide import Taximetro  # Importar la clase Taximetro que se va a probar (ajustar nombre si es diferente)
 
 class TestTaximetro(unittest.TestCase): # clase base para definir las pruebas unitarias
     """
