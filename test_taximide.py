@@ -12,23 +12,24 @@ class TestTaximetro(unittest.TestCase): # clase base para definir las pruebas un
         """
         Configuración inicial que se ejecuta antes de cada prueba.
         """
-        self.root = tk.Tk()  # Crear una ventana Tkinter para las pruebas
-        self.contraseña = "test123"  # Contraseña de prueba
-        self.taximetro = Taximetro(self.contraseña, self.root)  # Instanciar el objeto Taximetro
+        self.root = tk.Tk()  # Crea una nueva instancia de la clase Tk del módulo tkinter, que representa una ventana de la interfaz gráfica Tkinter. Esta ventana será utilizada en las pruebas que necesiten interactuar con elementos de la interfaz gráfica.
+        self.contraseña = "test123"  # Define una contraseña de prueba. Este valor se utilizará en las pruebas que necesiten autenticación o validación de contraseña.
+        self.taximetro = Taximetro(self.contraseña, self.root)  # Crea una instancia del objeto Taximetro utilizando la contraseña de prueba y la ventana Tkinter creada anteriormente (self.root).
 
     def tearDown(self):
         """
-        Limpieza que se ejecuta después de cada prueba (no realiza ninguna acción específica aquí).
+        Limpieza que se ejecuta después de cada prueba (no realiza ninguna acción específica aquí, ya que está definido como pass).
         """
         pass
+    #setUp y tearDown son métodos especiales en el contexto de las pruebas unitarias que se utilizan para la inicialización y la limpieza, respectivamente, antes y después de cada prueba. Esto facilita la creación de pruebas más robustas y mantenibles en entornos de desarrollo en Python.
 
     def test_authenticate_with_correct_password(self):
         """
-        Prueba para autenticar con la contraseña correcta.
+        Prueba para verificar si el método autenticar de self.taximetro funciona correctamente cuando se le pasa la contraseña correcta.
         """
-        result = self.taximetro.autenticar(self.root)
-        print(f"Resultado de autenticar: {result}")  # Agregar esta línea para depurar
-        self.assertTrue(result, "La autenticación con contraseña correcta ha fallado.") # Utiliza assertTrue() para verificar si self.taximetro.autenticar(self.root) retorna True.
+        result = self.taximetro.autenticar(self.root) # self.taximetro.autenticar(self.root): Llama al método autenticar de self.taximetro, pasándole self.root como argumento. self.root podría ser una referencia a un objeto raíz de la interfaz de usuario o cualquier otro objeto necesario para la autenticación. El resultado de self.taximetro.autenticar(self.root) se guarda en la variable result.
+        print(f"Resultado de autenticar: {result}")  # Esta línea imprime el resultado de la autenticación. Es útil para propósitos de depuración, para ver qué valor está devolviendo el método autenticar cuando se le pasa la contraseña correcta.
+        self.assertTrue(result, "La autenticación con contraseña correcta ha fallado.") # Utiliza assertTrue() para verificar si la expresión dada (result) es verdadera. En este caso, espera que result sea True para indicar que la autenticación con la contraseña correcta fue exitosa. El segundo argumento de assertTrue es un mensaje opcional que se mostrará si la aserción falla. En este caso, indica que la autenticación con contraseña correcta ha fallado si result no es True.
 
     def test_authenticate_with_incorrect_password(self):
         """
@@ -92,15 +93,15 @@ class TestTaximetro(unittest.TestCase): # clase base para definir las pruebas un
 
     def test_verify_password_with_correct_password(self):
         """
-        Prueba para verificar una contraseña correcta.
+        Prueba para verificar el comportamiento del método verify_password cuando se le proporciona una contraseña correcta.
         """
-        self.assertTrue(self.taximetro.verify_password(self.contraseña))
+        self.assertTrue(self.taximetro.verify_password(self.contraseña)) # assertTrue es un método de aserción que pertenece al framework de pruebas (unittest). Este método verifica si la expresión dada (self.taximetro.verify_password(self.contraseña)) es verdadera. En este contexto, espera que self.taximetro.verify_password(self.contraseña) devuelva True cuando se le pase la contraseña correcta (self.contraseña). verify_password es un método que verifica si la contraseña proporcionada coincide con la contraseña almacenada o esperada en self.taximetro.
 
     def test_verify_password_with_incorrect_password(self):
         """
-        Prueba para verificar una contraseña incorrecta.
+        Prueba para verificar el comportamiento del método verify_password cuando se le pasa una contraseña incorrecta ("incorrecta" en este caso).
         """
-        self.assertFalse(self.taximetro.verify_password("incorrecta"))
+        self.assertFalse(self.taximetro.verify_password("incorrecta")) # assertFalse es un método de aserción que también pertenece al framework de pruebas (unittest). Este método verifica si la expresión dada (self.taximetro.verify_password("incorrecta")) es falsa. En este contexto, espera que self.taximetro.verify_password("incorrecta") devuelva False cuando se le pase la contraseña incorrecta "incorrecta". verify_password es el método que verifica si la contraseña proporcionada coincide con la contraseña almacenada o esperada en self.taximetro.
 
 if __name__ == "__main__": # Se asegura de que las pruebas se ejecuten solo si este script se ejecuta directamente, no si se importa como módulo. 
     unittest.main() # ejecuta todas las pruebas definidas en la clase TestTaximetro.
