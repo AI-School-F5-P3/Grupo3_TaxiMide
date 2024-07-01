@@ -1,6 +1,6 @@
 import hashlib #Se usa para generar hashes de contraseñas, proporcionando seguridad en el almacenamiento de las mismas.
 import re   #Permite el uso de expresiones regulares, aquí usamos para validar formatos de contraseñas.
-import os  #Proporciona funciones para interactuar con el sistema operativo, como manejar rutas de archivos. Aquí usamos para el logo.
+import os  #Proporciona funciones para interactuar con el sistema operativo, como manejar rutas de archivos. Aquí usamos para la carpeta "records" y el logo.
 import json   #Se utiliza para leer y escribir datos en formato JSON, aquí guardamos contraseñas hasheadas
 import time #Permite trabajar con timestamps y realizar mediciones de tiempo, crucial para el funcionamiento del taxímetro.
 import logging #Se usa para registrar eventos y errores de la aplicación en un archivo de log.
