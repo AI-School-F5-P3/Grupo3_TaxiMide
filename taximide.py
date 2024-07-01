@@ -528,11 +528,10 @@ class Taximetro:
             self.boton_parada.configure(state=tk.DISABLED)
 #Dependiendo del nuevo estado (en_movimiento), habilita o deshabilita los botones correspondientes en la interfaz gráfica.    
         logging.info(f"Taxi en {estado}.")
-
+#Registra el nuevo estado en el log. 
   
     def iniciar_movimiento(self):
         '''
-        Registra el nuevo estado en el log. 
         Para definir el método del inicio de movimiento, llama al método cambiar_estado para índicar que está en movimiento y le pasa función time para que le devuelva el tiempo en segundos   
         '''
         self._cambiar_estado(time.time(), True)
@@ -540,7 +539,7 @@ class Taximetro:
         
     def detener_movimiento(self):
         '''
-        Para definir el método del inicio de movimiento, llama al método cambiar_estado para índicar que está en movimiento y le pasa función time para que le devuelva el tiempo en segundos      
+        Para definir el método detener movimiento, llama al método cambiar_estado (False) para índicar que está en parado y le pasa función time para que le devuelva el tiempo en segundos      
         '''
         self._cambiar_estado(time.time(), False)
 
