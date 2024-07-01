@@ -300,26 +300,26 @@ class Taximetro:
         self.root.deiconify()
 
     def actualizar_tiempo_costo(self):
-        tiempo_actual = time.time()
-        tiempo_transcurrido = tiempo_actual - self.tiempo_ultimo_cambio
-        if self.en_movimiento:
-            self.tiempo_movimiento += tiempo_transcurrido
-        else:
-            self.tiempo_parado += tiempo_transcurrido
-        
-        self.tiempo_total = self.tiempo_movimiento + self.tiempo_parado
-        self.total_euros = (self.tiempo_movimiento * self.tarifa_movimiento) + (self.tiempo_parado * self.tarifa_parado)
+        tiempo_actual = time.time()  # Obtiene el tiempo actual
+        tiempo_transcurrido = tiempo_actual - self.tiempo_ultimo_cambio  # Calcula el tiempo transcurrido desde el último cambio
+        if self.en_movimiento:  # Si el taxi está en movimiento
+            self.tiempo_movimiento += tiempo_transcurrido  # Incrementa el tiempo de movimiento
+        else:  # Si el taxi está parado
+            self.tiempo_parado += tiempo_transcurrido  # Incrementa el tiempo parado
 
-        horas, resto = divmod(self.tiempo_total, 3600)
-        minutos, segundos = divmod(resto, 60)
-        tiempo_formateado = f"{int(horas):02}:{int(minutos):02}:{int(segundos):02}"
+        self.tiempo_total = self.tiempo_movimiento + self.tiempo_parado  # Calcula el tiempo total
+        self.total_euros = (self.tiempo_movimiento * self.tarifa_movimiento) + (self.tiempo_parado * self.tarifa_parado)  # Calcula el costo total
 
-        # Actualizamos los contadores visuales en el Canvas
+        horas, resto = divmod(self.tiempo_total, 3600)  # Calcula las horas y el resto
+        minutos, segundos = divmod(resto, 60)  # Calcula los minutos y segundos
+        tiempo_formateado = f"{int(horas):02}:{int(minutos):02}:{int(segundos):02}"  # Formatea el tiempo en HH:MM:SS
+
+        # Actualiza los contadores visuales en el Canvas
         self.actualizar_canvas(self.canvas_tiempo, tiempo_formateado)
         self.actualizar_canvas(self.canvas_euros, f"{self.total_euros:.2f} €")
 
-        self.tiempo_ultimo_cambio = tiempo_actual
-        self.root.after(1000, self.actualizar_tiempo_costo)
+        self.tiempo_ultimo_cambio = tiempo_actual  # Actualiza el tiempo del último cambio
+        self.root.after(1000, self.actualizar_tiempo_costo)  # Llama a esta función nuevamente después de 1 segundo
 
     def actualizar_canvas(self, canvas, texto):
         canvas.delete("all")  # Borramos todo lo dibujado previamente en el Canvas
