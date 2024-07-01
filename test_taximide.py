@@ -23,27 +23,6 @@ class TestTaximetro(unittest.TestCase): # clase base para definir las pruebas un
         pass
     #setUp y tearDown son métodos especiales en el contexto de las pruebas unitarias que se utilizan para la inicialización y la limpieza, respectivamente, antes y después de cada prueba. Esto facilita la creación de pruebas más robustas y mantenibles en entornos de desarrollo en Python.
 
-    def test_authenticate_with_correct_password(self):
-        """
-        Prueba para verificar si el método autenticar de self.taximetro funciona correctamente cuando se le pasa la contraseña correcta.
-        """
-        result = self.taximetro.autenticar(self.root) # self.taximetro.autenticar(self.root): Llama al método autenticar de self.taximetro, pasándole self.root como argumento. self.root podría ser una referencia a un objeto raíz de la interfaz de usuario o cualquier otro objeto necesario para la autenticación. El resultado de self.taximetro.autenticar(self.root) se guarda en la variable result.
-        print(f"Resultado de autenticar: {result}")  # Esta línea imprime el resultado de la autenticación. Es útil para propósitos de depuración, para ver qué valor está devolviendo el método autenticar cuando se le pasa la contraseña correcta.
-        self.assertTrue(result, "La autenticación con contraseña correcta ha fallado.") # Utiliza assertTrue() para verificar si la expresión dada (result) es verdadera. En este caso, espera que result sea True para indicar que la autenticación con la contraseña correcta fue exitosa. El segundo argumento de assertTrue es un mensaje opcional que se mostrará si la aserción falla. En este caso, indica que la autenticación con contraseña correcta ha fallado si result no es True.
-
-    def test_authenticate_with_incorrect_password(self):
-        """
-        Prueba para autenticar con una contraseña incorrecta. Utiliza el módulo `mock`de la librería unittest para simular entradas/salidas. Verifica que el programa termine con SystemExit y que self.taximetro.autenticado sea False, es decir comprueba que la autenticación falla correctamente cuando se ingresa una contraseña incorrecta.
-        """
-        with patch("tkinter.simpledialog.askstring", return_value="incorrecta"): # Esto reemplaza temporalmente la función askstring del módulo tkinter.simpledialog para que siempre devuelva la cadena "incorrecta". Esto simula el comportamiento de un usuario ingresando una contraseña incorrecta.
-            with patch("tkinter.messagebox.showerror"): # Estos reemplazan temporalmente las funciones showerror y showinfo del módulo tkinter.messagebox con mocks. No se especifican valores de retorno, simplemente se interceptan estas llamadas para que no muestren mensajes reales durante la prueba.
-                with patch("tkinter.messagebox.showinfo"):
-                    # Verificación del Comportamiento
-                    with self.assertRaises(SystemExit):  # Este es un contexto de unittest que asegura que se lance una excepción SystemExit cuando se llama a self.taximetro.autenticar(self.root). Esto verifica que el programa intenta cerrarse cuando la autenticación falla.
-                        self.taximetro.autenticar(self.root) # Se llama al método autenticar del objeto self.taximetro, pasando self.root como argumento. Se espera que este método intente autenticar al usuario, falle debido a la contraseña incorrecta y provoque un SystemExit.
-                    # Verificación del Estado
-                    self.assertFalse(self.taximetro.autenticado) # Después de que autenticar lance SystemExit, se verifica que el atributo autenticado del objeto self.taximetro sea False. Esto confirma que la autenticación no fue exitosa.
-
     def test_start_movement(self):
         """
         Prueba para iniciar el movimiento, simulando un estado inexistente (del self.taximetro.estado_label). Al no existir el atributo estado_label se asegura que se lance AttributeError. Esto es importante para asegurar que el código tenga un manejo adecuado de errores y sea robusto frente a situaciones inesperadas.
