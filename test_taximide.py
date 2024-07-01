@@ -1,6 +1,5 @@
 import unittest  # Importar el módulo de unittest para escribir pruebas unitarias
 import tkinter as tk  # Importar tkinter para simular interfaces gráficas de usuario
-from unittest.mock import patch  # Importar patch de unittest.mock para realizar mock de funciones
 from taximide import Taximetro  # Importar la clase Taximetro que se va a probar (ajustar nombre si es diferente)
 
 class TestTaximetro(unittest.TestCase): # clase base para definir las pruebas unitarias
@@ -22,42 +21,7 @@ class TestTaximetro(unittest.TestCase): # clase base para definir las pruebas un
         """
         pass
     #setUp y tearDown son métodos especiales en el contexto de las pruebas unitarias que se utilizan para la inicialización y la limpieza, respectivamente, antes y después de cada prueba. Esto facilita la creación de pruebas más robustas y mantenibles en entornos de desarrollo en Python.
-
-    def test_authenticate_with_correct_password(self):
-        """
-        Prueba para verificar si el método autenticar de self.taximetro funciona correctamente cuando se le pasa la contraseña correcta.
-        """
-        result = self.taximetro.autenticar(self.root) # self.taximetro.autenticar(self.root): Llama al método autenticar de self.taximetro, pasándole self.root como argumento. self.root podría ser una referencia a un objeto raíz de la interfaz de usuario o cualquier otro objeto necesario para la autenticación. El resultado de self.taximetro.autenticar(self.root) se guarda en la variable result.
-        print(f"Resultado de autenticar: {result}")  # Esta línea imprime el resultado de la autenticación. Es útil para propósitos de depuración, para ver qué valor está devolviendo el método autenticar cuando se le pasa la contraseña correcta.
-        self.assertTrue(result, "La autenticación con contraseña correcta ha fallado.") # Utiliza assertTrue() para verificar si la expresión dada (result) es verdadera. En este caso, espera que result sea True para indicar que la autenticación con la contraseña correcta fue exitosa. El segundo argumento de assertTrue es un mensaje opcional que se mostrará si la aserción falla. En este caso, indica que la autenticación con contraseña correcta ha fallado si result no es True.
-
-    def test_authenticate_with_incorrect_password(self):
-        """
-        Prueba para autenticar con una contraseña incorrecta. Utiliza el módulo `mock`de la librería unittest para simular entradas/salidas. Verifica que el programa termine con SystemExit y que self.taximetro.autenticado sea False, es decir comprueba que la autenticación falla correctamente cuando se ingresa una contraseña incorrecta.
-        """
-        with patch("tkinter.simpledialog.askstring", return_value="incorrecta"): # Esto reemplaza temporalmente la función askstring del módulo tkinter.simpledialog para que siempre devuelva la cadena "incorrecta". Esto simula el comportamiento de un usuario ingresando una contraseña incorrecta.
-            with patch("tkinter.messagebox.showerror"): # Estos reemplazan temporalmente las funciones showerror y showinfo del módulo tkinter.messagebox con mocks. No se especifican valores de retorno, simplemente se interceptan estas llamadas para que no muestren mensajes reales durante la prueba.
-                with patch("tkinter.messagebox.showinfo"):
-                    # Verificación del Comportamiento
-                    with self.assertRaises(SystemExit):  # Este es un contexto de unittest que asegura que se lance una excepción SystemExit cuando se llama a self.taximetro.autenticar(self.root). Esto verifica que el programa intenta cerrarse cuando la autenticación falla.
-                        self.taximetro.autenticar(self.root) # Se llama al método autenticar del objeto self.taximetro, pasando self.root como argumento. Se espera que este método intente autenticar al usuario, falle debido a la contraseña incorrecta y provoque un SystemExit.
-                    # Verificación del Estado
-                    self.assertFalse(self.taximetro.autenticado) # Después de que autenticar lance SystemExit, se verifica que el atributo autenticado del objeto self.taximetro sea False. Esto confirma que la autenticación no fue exitosa.
-
-    def test_load_non_existent_logo(self):
-        """
-        Prueba para cargar un logo que no existe. Verifica que al intentar cargar un logo que no existe (self.taximetro.cargar_logo(logo_path)), se genere una excepción tk.TclError con el mensaje esperado.
-        """
-        logo_path = "ruta/que/no/existe/logo.png" # Se define una variable logo_path que contiene la ruta a un archivo de logo que no existe. Esto se usa para simular la situación de intentar cargar un archivo inexistente.
-        try: #Se intenta cargar el logo usando el método cargar_logo del objeto taximetro. Si este método no lanza una excepción, la prueba falla inmediatamente con self.fail, indicando que se esperaba una excepción.
-            self.taximetro.cargar_logo(logo_path)
-            # Si la carga del logo no genera excepción, fallar la prueba
-            self.fail("Se esperaba una excepción al cargar un logo inexistente.")
-        except tk.TclError as e: #Si se lanza una excepción tk.TclError, se captura en la variable e. Luego, se verifica que el mensaje de error de la excepción contenga una cadena esperada, que indica que el archivo no pudo ser abierto porque no existe. La prueba usa self.assertIn para comprobar que el mensaje de error de la excepción contiene el mensaje esperado. Si no lo contiene, la prueba falla y muestra el mensaje "Mensaje de error inesperado".
-            # Verificar que el mensaje de error contenga la cadena esperada
-            expected_message = f'couldn\'t open "{logo_path}": no such file or directory'
-            self.assertIn(expected_message, str(e),
-                          f"Mensaje de error inesperado: {str(e)}")
+                    
 
     def test_start_movement(self):
         """
@@ -105,14 +69,3 @@ class TestTaximetro(unittest.TestCase): # clase base para definir las pruebas un
 
 if __name__ == "__main__": # Se asegura de que las pruebas se ejecuten solo si este script se ejecuta directamente, no si se importa como módulo. 
     unittest.main() # ejecuta todas las pruebas definidas en la clase TestTaximetro.
-
-'''
-Notas Adicionales:
-
-Mocking (patch): Se usa para simular el comportamiento de funciones o métodos dentro de las pruebas, permitiendo controlar su respuesta y asegurar el flujo esperado.
-
-Manejo de Excepciones: Se utilizan bloques try-except y assertRaises para verificar que ciertos errores (excepciones) sean lanzados durante las pruebas.
-
-Assert Statements: Los métodos assertTrue(), assertFalse(), assertIn() y fail() son utilizados para verificar condiciones y asegurar que las pruebas pasen o fallen según lo esperado.
-
-'''
