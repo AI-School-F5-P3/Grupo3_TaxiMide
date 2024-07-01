@@ -517,7 +517,6 @@ class Taximetro:
 #Si el taxi está en parado, el tiempo será += el tiempo que ha transcurrido desde que cambiamos al estado de parada
         self.en_movimiento = en_movimiento
         self.tiempo_ultimo_cambio = tiempo_actual
-#????????
         estado = "movimiento" if en_movimiento else "parado"
         self.estado_label.configure(text=f"Taxi en {estado}.")
 #Para actualizar la interfaz grafica si está en movimiento o en parado el taxi   
