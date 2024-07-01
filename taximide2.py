@@ -1,3 +1,4 @@
+# sin comentarios
 import hashlib 
 import re   
 import os 
@@ -8,7 +9,7 @@ import argparse
 import tkinter as tk 
 import customtkinter 
 from tkinter import messagebox, simpledialog 
-import sqlite3 # Permite interactuar con bases de datos SQLite para almacenar registros de carreras.
+import sqlite3
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 

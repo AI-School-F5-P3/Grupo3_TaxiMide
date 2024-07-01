@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import patch, Mock
 import tkinter as tk
-from taximide2 import Taximetro
+from taximide import Taximetro
 
 class TestTaximetroApp(unittest.TestCase):
 
