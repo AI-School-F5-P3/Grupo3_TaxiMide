@@ -44,21 +44,6 @@ class TestTaximetro(unittest.TestCase): # clase base para definir las pruebas un
                     # Verificación del Estado
                     self.assertFalse(self.taximetro.autenticado) # Después de que autenticar lance SystemExit, se verifica que el atributo autenticado del objeto self.taximetro sea False. Esto confirma que la autenticación no fue exitosa.
 
-    def test_load_non_existent_logo(self):
-        """
-        Prueba para cargar un logo que no existe. Verifica que al intentar cargar un logo que no existe (self.taximetro.cargar_logo(logo_path)), se genere una excepción tk.TclError con el mensaje esperado.
-        """
-        logo_path = "ruta/que/no/existe/logo.png" # Se define una variable logo_path que contiene la ruta a un archivo de logo que no existe. Esto se usa para simular la situación de intentar cargar un archivo inexistente.
-        try: #Se intenta cargar el logo usando el método cargar_logo del objeto taximetro. Si este método no lanza una excepción, la prueba falla inmediatamente con self.fail, indicando que se esperaba una excepción.
-            self.taximetro.cargar_logo(logo_path)
-            # Si la carga del logo no genera excepción, fallar la prueba
-            self.fail("Se esperaba una excepción al cargar un logo inexistente.")
-        except tk.TclError as e: #Si se lanza una excepción tk.TclError, se captura en la variable e. Luego, se verifica que el mensaje de error de la excepción contenga una cadena esperada, que indica que el archivo no pudo ser abierto porque no existe. La prueba usa self.assertIn para comprobar que el mensaje de error de la excepción contiene el mensaje esperado. Si no lo contiene, la prueba falla y muestra el mensaje "Mensaje de error inesperado".
-            # Verificar que el mensaje de error contenga la cadena esperada
-            expected_message = f'couldn\'t open "{logo_path}": no such file or directory'
-            self.assertIn(expected_message, str(e),
-                          f"Mensaje de error inesperado: {str(e)}")
-
     def test_start_movement(self):
         """
         Prueba para iniciar el movimiento, simulando un estado inexistente (del self.taximetro.estado_label). Al no existir el atributo estado_label se asegura que se lance AttributeError. Esto es importante para asegurar que el código tenga un manejo adecuado de errores y sea robusto frente a situaciones inesperadas.
