@@ -503,7 +503,7 @@ class Taximetro:
     def _cambiar_estado(self, tiempo_actual, en_movimiento):
         '''
         _cambiar_estado => para indicar que es un método privado 
-        
+            (acceso limitado unicamente a la clase que lo define, no está destinado a ser usado fuera de esa clase)
         tiempo_transcurrido => Calcula el tiempo transcurrido desde el último cambio de estado.
         
         '''
@@ -515,8 +515,8 @@ class Taximetro:
 #Para deteterminar el tiempo transcurrido entre los cambios de estado(parado y moviemto)
 #Si el taxi está en moviemiento, el tiempo será += el tiempo que ha transcurrido desde que cambiamos al estado de marcha
 #Si el taxi está en parado, el tiempo será += el tiempo que ha transcurrido desde que cambiamos al estado de parada
-        self.en_movimiento = en_movimiento
-        self.tiempo_ultimo_cambio = tiempo_actual
+        self.en_movimiento = en_movimiento #Asgina el valor del parametro actual 
+        self.tiempo_ultimo_cambio = tiempo_actual #Asgina el valor del parametro actual 
         estado = "movimiento" if en_movimiento else "parado"
         self.estado_label.configure(text=f"Taxi en {estado}.")
 #Para actualizar la interfaz grafica si está en movimiento o en parado el taxi   
